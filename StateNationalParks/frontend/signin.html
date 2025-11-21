@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign in · State National Parks</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="auth-page">
+    <div class="auth-shell">
+      <header class="auth-header">
+        <a class="logo back-link" href="homepage.html">
+          <span class="accent-dot"></span>
+          State National Parks
+        </a>
+        <a class="back-link" href="homepage.html">← Back to overview</a>
+      </header>
+
+      <div class="auth-layout">
+        <section class="auth-card">
+          <p class="eyebrow">AuthManager.authenticate()</p>
+          <h1>Welcome back</h1>
+          <p class="muted">
+            Demo-only form. Use it to visualize how the front-end routes to
+            <code>AuthManager</code> before entering dashboard flows.
+          </p>
+          <form>
+            <label>
+              Username
+              <input type="text" name="username" placeholder="ranger.ada" required />
+            </label>
+            <label>
+              Password
+              <input type="password" name="password" placeholder="••••••••" required />
+            </label>
+            <button type="submit" class="btn primary">Sign in</button>
+          </form>
+          <footer>
+            <p class="muted">
+              Need an account?
+              <a href="signup.html">Register as a Customer</a>
+            </p>
+          </footer>
+        </section>
+
+        <aside class="auth-context">
+          <p class="eyebrow">User hierarchy</p>
+          <h2>Credentials map to UML roles</h2>
+          <ul>
+            <li>
+              <strong>Admin</strong> instances expose
+              <code>moderateReview()</code> and <code>viewAllOrders()</code>.
+            </li>
+            <li>
+              <strong>Customers</strong> inherit <code>login()</code>,
+              <code>logout()</code>, and call <code>viewOrders()</code>.
+            </li>
+            <li>
+              Successful login seeds <code>session.userID</code> for
+              SystemController orchestration.
+            </li>
+          </ul>
+        </aside>
+      </div>
+    </div>
+    <script src="app.js" defer></script>
+  </body>
+</html>
