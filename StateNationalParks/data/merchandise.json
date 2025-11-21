@@ -1,0 +1,10 @@
+[
+    {
+        "itemID": "M1",
+        "name": "T-Shirt",
+        "quantity": 1,
+        "unitPrice": 25.0,
+        "category": "Clothing",
+        "stock": 50
+    }
+]

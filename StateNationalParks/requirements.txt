@@ -1,0 +1,2 @@
+# install Flask before running the project
+flask
