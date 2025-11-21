@@ -22,73 +22,40 @@
         <a class="back-link" href="signin.html">Have credentials? Sign in →</a>
       </header>
 
-      <div class="auth-layout">
-        <section class="auth-card">
-          <p class="eyebrow">Customer.register()</p>
-          <h1>Create your profile</h1>
-          <p class="muted">
-            Captures the same properties used by the <code>User</code> base class
-            and <code>Customer</code> subclass in the UML.
-          </p>
-          <form>
-            <label>
-              Full name
-              <input type="text" name="fullName" placeholder="Ada Ranger" required />
-            </label>
-            <label>
-              Email
-              <input type="email" name="email" placeholder="ada@example.com" required />
-            </label>
-            <label>
-              Username
-              <input type="text" name="username" placeholder="ranger.ada" required />
-            </label>
-            <label>
-              Password
-              <input type="password" name="password" placeholder="Create a password" required />
-            </label>
-            <label>
-              Customer type
-              <select name="customerType" required>
-                <option value="">Select type</option>
-                <option value="Resident">Resident</option>
-                <option value="Non-Resident">Non-Resident</option>
-                <option value="Educational Group">Educational Group</option>
-              </select>
-            </label>
-            <label class="checkbox-row">
-              <input type="checkbox" required />
-              <span>I agree to let AuthManager.saveUsers() store this demo profile.</span>
-            </label>
-            <button type="submit" class="btn primary">Register</button>
-          </form>
-          <footer>
-            <p class="muted">
-              Already registered?
-              <a href="signin.html">Sign in</a>
-            </p>
-          </footer>
-        </section>
-
-        <aside class="auth-context">
-          <p class="eyebrow">What happens next?</p>
-          <h2>System flow after registration</h2>
-          <ul>
-            <li>
-              <code>AuthManager.registerUser()</code> appends the customer into
-              <code>users: List&lt;User&gt;</code>.
-            </li>
-            <li>
-              <code>SystemController.createOrder()</code> can immediately attach
-              this customer to tickets or merchandise.
-            </li>
-            <li>
-              Receipts and Statistics update the same way as shown on
-              <a href="homepage.html">the overview page</a>.
-            </li>
-          </ul>
-        </aside>
-      </div>
+        <div class="auth-layout">
+          <section class="auth-card">
+            <h1>Create your profile</h1>
+            <form>
+              <label>
+                Full name
+                <input type="text" name="fullName" placeholder="Ada Ranger" required />
+              </label>
+              <label>
+                Email
+                <input type="email" name="email" placeholder="ada@example.com" required />
+              </label>
+              <label>
+                Username
+                <input type="text" name="username" placeholder="ranger.ada" required />
+              </label>
+              <label>
+                Password
+                <input type="password" name="password" placeholder="Create a password" required />
+              </label>
+              <label class="checkbox-row">
+                <input type="checkbox" required />
+                <span>I agree to let AuthManager.saveUsers() store this demo profile.</span>
+              </label>
+              <button type="submit" class="btn primary">Register</button>
+            </form>
+            <footer>
+              <p class="muted">
+                Already registered?
+                <a href="signin.html">Sign in</a>
+              </p>
+            </footer>
+          </section>
+        </div>
     </div>
     <script src="app.js" defer></script>
   </body>

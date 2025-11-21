@@ -18,192 +18,46 @@
         <span class="accent-dot"></span>
         State National Parks
       </div>
-      <nav class="nav-links">
-        <a href="#modules">Modules</a>
-        <a href="#roles">Roles</a>
-        <a href="#orders">Orders</a>
-        <a href="#analytics">Analytics</a>
-        <a href="signin.html" class="btn ghost small">Sign in</a>
-        <a href="signup.html" class="btn primary small">Create account</a>
-      </nav>
-    </header>
+        <nav class="nav-links">
+          <a href="homepage.html#access">Access</a>
+          <a href="homepage.html#tickets">Tickets</a>
+          <a href="homepage.html#reviews">Reviews</a>
+          <a href="merchandise.html">Merchandise</a>
+          <a href="signin.html" class="btn ghost small">Sign in</a>
+          <a href="signup.html" class="btn primary small">Create account</a>
+        </nav>
+      </header>
 
-    <main>
-      <section class="hero" id="overview">
-        <div class="hero-content">
-          <p class="eyebrow">finalUMLdrawio → Frontend only</p>
-          <h1>Operations cockpit for park services</h1>
-          <p>
-            This single-page experience mirrors every entity and workflow from
-            the UML—including authentication, ticketing, merchandising,
-            payments, reviews, and reporting—so the visual model becomes
-            navigable UI.
-          </p>
-          <div class="hero-actions">
-            <a href="signin.html" class="btn primary">Access AuthManager</a>
-            <a href="#modules" class="btn secondary">Explore system map</a>
-          </div>
-          <div class="hero-meta">
-            <article>
-              <h3>&lt;&lt;Service&gt;&gt; AuthManager</h3>
-              <p>
-                Holds <strong>users: List&lt;User&gt;</strong> and exposes
-                <code>authenticate()</code>, <code>registerUser()</code>,
-                <code>loadUsers()</code>, <code>saveUsers()</code>.
-              </p>
-            </article>
-            <article>
-              <h3>&lt;&lt;Coordinator&gt;&gt; SystemController</h3>
-              <p>
-                Orchestrates orders, tickets, and merchandise while persisting
-                data via <code>loadData()</code> / <code>saveData()</code>.
-              </p>
-            </article>
-          </div>
-        </div>
-        <div class="hero-panel">
-          <div class="panel-card">
-            <p class="eyebrow">Live snapshot</p>
-            <h2>Orders at a glance</h2>
-            <ul class="panel-list">
-              <li>
-                <span>Tickets pending</span>
-                <strong>124</strong>
-              </li>
-              <li>
-                <span>Merch items reserved</span>
-                <strong>312</strong>
-              </li>
-              <li>
-                <span>Refund requests</span>
-                <strong>7</strong>
-              </li>
-            </ul>
-          </div>
-          <div class="panel-card alt">
-            <p class="eyebrow">Statistic generateReport()</p>
-            <h2>$2.4M revenue</h2>
-            <p class="muted">↑ 12% vs last season</p>
-            <div class="progress-pill">
-              <span>Top selling item: Explorer Pass</span>
-              <span>44% of orders</span>
-            </div>
-          </div>
-        </div>
-      </section>
+      <section
+        class="hero hero-banner hero-full"
+        id="overview"
+        style="--hero-image: url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=2000&q=80');"
+      ></section>
 
-      <section id="modules">
-        <div class="section-heading">
-          <p class="eyebrow">Class coverage</p>
-          <h2>All UML building blocks rendered as UI cards</h2>
-          <p>
-            Attributes and operations from <code>finalUMLdrawio.png</code> are
-            translated into digestible interface modules.
-          </p>
-        </div>
-        <div id="module-grid" class="module-grid"></div>
-      </section>
-
-      <section id="roles">
-        <div class="section-heading">
-          <p class="eyebrow">User hierarchy</p>
-          <h2>Admin vs Customer responsibilities</h2>
-          <p>
-            Both roles inherit from the abstract <code>User</code> class and
-            rely on <code>login()</code> / <code>logout()</code>.
-          </p>
-        </div>
-        <div class="roles-grid">
-          <article class="role-card">
-            <header>
-              <p class="eyebrow">Admin</p>
-              <h3>&lt;&lt;User&gt;&gt; adminRole: string</h3>
-            </header>
-            <ul>
-              <li>Moderate reviews via <code>moderateReview()</code></li>
-              <li>Inspect every order with <code>viewAllOrders()</code></li>
-              <li>Audit payments and refunds before Statistic updates</li>
-            </ul>
-            <div class="badge success">Full access</div>
+      <main>
+        <section id="access">
+          <div class="section-heading">
+            <p class="eyebrow">Account access</p>
+            <h2>Sign in or create an account before touching tickets</h2>
+          </div>
+        <div class="access-grid">
+          <article class="access-card">
+            <h3>Already registered?</h3>
+            <a href="signin.html" class="btn primary">Sign in</a>
           </article>
-          <article class="role-card">
-            <header>
-              <p class="eyebrow">Customer</p>
-              <h3>customerType: string</h3>
-            </header>
-            <ul>
-              <li>Interact through <code>register()</code> &amp; view orders</li>
-              <li>Create tickets, merchandise orders, and reviews</li>
-              <li>Trigger payments and receipts for every purchase</li>
-            </ul>
-            <div class="badge warning">Scoped access</div>
+          <article class="access-card">
+            <h3>New visitor?</h3>
+            <a href="signup.html" class="btn secondary">Create account</a>
           </article>
         </div>
       </section>
 
-      <section id="orders">
-        <div class="section-heading">
-          <p class="eyebrow">Order lifecycle</p>
-          <h2>SystemController orchestrates each status</h2>
-          <p>
-            The visual timeline follows <code>createOrder()</code>,
-            <code>addItem()</code>, <code>processPayment()</code>, and
-            <code>requestRefund()</code>.
-          </p>
-        </div>
-        <div id="order-timeline" class="timeline"></div>
-      </section>
-
-      <section id="data">
-        <div class="section-heading">
-          <p class="eyebrow">Domain datasets</p>
-          <h2>Tickets, merchandise, and fulfillment queues</h2>
-          <p>
-            Each table mimics the JSON seed files the backend consumes. All data
-            is front-end only for this demo.
-          </p>
-        </div>
-        <div class="data-grid">
-          <article class="data-card">
-            <header>
-              <h3>Tickets (Ticket + OrderItem)</h3>
-              <p>Preview of visit scheduling and quotas</p>
-            </header>
-            <table>
-              <thead>
-                <tr>
-                  <th>Park</th>
-                  <th>Type</th>
-                  <th>Visit date</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody id="ticket-table-body"></tbody>
-            </table>
-          </article>
-          <article class="data-card">
-            <header>
-              <h3>Merchandise inventory</h3>
-              <p>
-                Mirrors <code>Merchandise.updateStock()</code> and category
-                breakdowns.
-              </p>
-            </header>
-            <div id="merch-grid" class="merch-grid"></div>
-          </article>
-        </div>
-      </section>
-
-      <section id="interactions">
-        <div class="section-heading">
-          <p class="eyebrow">Simulated actions</p>
-          <h2>Forms emit activity as if SystemController handled them</h2>
-          <p>
-            Submitters don’t hit a backend—JavaScript simply writes to the
-            activity feed in the same order the UML expects.
-          </p>
-        </div>
-        <div class="forms-grid">
+        <section id="tickets">
+          <div class="section-heading">
+            <p class="eyebrow">Ticket operations</p>
+            <h2>Purchase, cancel, or refund park visits</h2>
+          </div>
+        <div class="forms-grid ticket-forms">
           <article class="form-card">
             <h3>Purchase Ticket</h3>
             <form id="ticket-form">
@@ -215,17 +69,69 @@
                 Ticket type
                 <input type="text" name="type" placeholder="Explorer Pass" required />
               </label>
+              <div class="ticket-form-grid">
+                <label>
+                  Visit date
+                  <input type="date" name="date" required />
+                </label>
+                <label>
+                  Entry time
+                  <input type="time" name="time" required />
+                </label>
+              </div>
+              <div class="ticket-form-grid">
+                <label>
+                  Adults
+                  <input type="number" name="adults" min="0" value="2" required />
+                </label>
+                <label>
+                  Kids
+                  <input type="number" name="kids" min="0" value="1" required />
+                </label>
+              </div>
               <label>
-                Visit date
-                <input type="date" name="date" required />
-              </label>
-              <label>
-                Quantity
-                <input type="number" name="qty" min="1" max="10" value="1" required />
+                Notes
+                <textarea name="notes" rows="2" placeholder="Optional details"></textarea>
               </label>
               <button type="submit" class="btn primary">Queue purchase</button>
             </form>
           </article>
+
+          <article class="form-card">
+            <h3>Cancel / Refund Ticket</h3>
+            <form id="cancel-form">
+              <label>
+                Order ID
+                <input type="text" name="orderID" placeholder="ORD-12345" required />
+              </label>
+              <label>
+                Ticket ID
+                <input type="text" name="ticketID" placeholder="TCK-987" required />
+              </label>
+              <label>
+                Action
+                <select name="action" required>
+                  <option value="">Choose</option>
+                  <option value="cancel">Cancel upcoming visit</option>
+                  <option value="refund">Request refund</option>
+                </select>
+              </label>
+                <label>
+                  Reason (optional)
+                  <textarea name="reason" rows="3" placeholder="Optional details"></textarea>
+                </label>
+              <button type="submit" class="btn secondary">Submit request</button>
+            </form>
+          </article>
+        </div>
+      </section>
+
+        <section id="reviews">
+          <div class="section-heading">
+            <p class="eyebrow">Share a review</p>
+            <h2>Close the loop after your visit</h2>
+          </div>
+        <div class="forms-grid">
           <article class="form-card">
             <h3>Submit Review</h3>
             <form id="review-form">
@@ -261,21 +167,40 @@
           </article>
         </div>
       </section>
-
-      <section id="analytics">
-        <div class="section-heading">
-          <p class="eyebrow">Statistics + receipts</p>
-          <h2>Data holders keep leadership aligned</h2>
-          <p>
-            Statistic.updateData(Order) and Receipt.generate() inform the cards
-            below. Values are mocked but follow the UML structure precisely.
-          </p>
-        </div>
-        <div id="stat-grid" class="stat-grid"></div>
-      </section>
     </main>
 
-    <footer>
+      <button class="cart-fab" id="cart-button" aria-haspopup="true" aria-expanded="false">
+        <span class="sr-only">View cart</span>
+        <span class="cart-count" id="cart-count">0</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            d="M7 4h-2l-1 2m0 0-2 4h3l1.5-3H19l-2 6H9l-1 2h11"
+            stroke="currentColor"
+            stroke-width="1.5"
+            fill="none"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+          <circle cx="10" cy="21" r="1.4" />
+          <circle cx="17" cy="21" r="1.4" />
+        </svg>
+      </button>
+      <div class="cart-drawer" id="cart-drawer" aria-live="polite">
+        <div class="cart-header">
+          <h3>Cart preview</h3>
+          <p class="muted">Tickets added from the purchase form</p>
+        </div>
+        <ul id="cart-items" class="cart-items"></ul>
+        <div class="cart-footer">
+          <div>
+            <p class="muted">Estimated total</p>
+            <strong id="cart-total">$0.00</strong>
+          </div>
+          <button class="btn secondary" type="button">Checkout</button>
+        </div>
+      </div>
+
+      <footer>
       <div>
         <p class="eyebrow">Need to test?</p>
         <p>
