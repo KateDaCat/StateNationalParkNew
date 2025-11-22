@@ -2,9 +2,29 @@
 
 const activityEntries = [];
 const MAX_FEED_ITEMS = 6;
+const cartItems = [];
+const ADULT_TICKET_PRICE = 45;
+const CHILD_TICKET_PRICE = 25;
+let cartDrawerEl;
+let cartButtonEl;
+let cartOverlayEl;
+let cartCloseBtn;
+let cartSummaryEl;
+let ticketSummaryEls = {};
 
 document.addEventListener("DOMContentLoaded", () => {
+  cartDrawerEl = document.getElementById("cart-drawer");
+  cartButtonEl = document.getElementById("cart-button");
+  cartOverlayEl = document.getElementById("cart-overlay");
+  cartCloseBtn = document.getElementById("cart-close");
+  cartSummaryEl = document.getElementById("cart-summary");
+
   attachFormHandlers();
+  renderCart();
+  attachCartControls();
+  attachMerchButtons();
+  attachColorPickers();
+  initTicketSummary();
 });
 
 function attachFormHandlers() {
@@ -13,31 +33,43 @@ function attachFormHandlers() {
   const reviewForm = document.getElementById("review-form");
 
   if (ticketForm) {
+    ticketForm.addEventListener("input", updateTicketSummary);
+    ticketForm.addEventListener("change", updateTicketSummary);
+
     ticketForm.addEventListener("submit", (event) => {
       event.preventDefault();
       const formData = new FormData(ticketForm);
       const park = formData.get("park");
-      const type = formData.get("type");
       const date = formData.get("date");
       const time = formData.get("time");
       const adults = Number(formData.get("adults")) || 0;
       const kids = Number(formData.get("kids")) || 0;
       const notes = formData.get("notes")?.trim();
+      const ticketLabel = park ? `${park} visit` : "Park ticket";
 
       const total = calculateTicketPrice(adults, kids);
       const partySummary = `${adults} adult(s) · ${kids} kid(s)`;
 
       pushActivity({
         type: "Ticket Purchase",
-        message: `${type} · ${partySummary}`,
+        message: `${ticketLabel} · ${partySummary}`,
         meta: `${park} · ${formatDate(date)} ${time || ""} · ${formatCurrency(total)}${
           notes ? ` · Note: ${notes}` : ""
         }`,
       });
 
       setActivityMessage("Ticket request queued for processing.");
+      addTicketEntriesToCart({
+        park,
+        date,
+        time,
+        adults,
+        kids,
+      });
       ticketForm.reset();
+      updateTicketSummary();
     });
+    updateTicketSummary();
   }
 
   if (cancelForm) {
@@ -113,6 +145,256 @@ function setActivityMessage(message) {
   }
 }
 
+function addItemToCart(item) {
+  const quantity = item.quantity ?? 1;
+  const unitPrice = item.unitPrice ?? item.total ?? 0;
+  const entry = {
+    id: `CART-${Date.now().toString().slice(-4)}`,
+    ...item,
+    quantity,
+    unitPrice,
+    total: unitPrice * quantity,
+  };
+  cartItems.unshift(entry);
+  cartItems.splice(6);
+  renderCart();
+  openCartDrawer();
+}
+
+function renderCart() {
+  const list = document.getElementById("cart-items");
+  const count = document.getElementById("cart-count");
+  const totalEl = document.getElementById("cart-total");
+  const summaryEl = cartSummaryEl;
+  if (!list || !count || !totalEl) return;
+
+  if (!cartItems.length) {
+    list.innerHTML = '<li class="cart-item muted">Your cart is empty.</li>';
+    if (summaryEl) {
+      summaryEl.textContent = "No items in cart";
+    }
+  } else {
+    list.innerHTML = cartItems
+      .map((item) => {
+        const quantityDetail = summarizeCartQuantity(item);
+        const colorBadge = renderColorBadge(item);
+        return `
+        <li class="cart-item">
+          <div class="cart-item-row">
+            <strong>${item.label}</strong>
+            <div class="cart-meta">
+              ${colorBadge}
+              <span class="cart-chip">${item.category || "Item"}</span>
+            </div>
+          </div>
+          <small class="muted">${describeCartItem(item)}</small>
+          ${quantityDetail ? `<small class="muted">${quantityDetail}</small>` : ""}
+          <div class="cart-item-row">
+            <div class="cart-item-controls" data-id="${item.id}">
+              <button type="button" class="cart-item-btn" data-action="decrease" aria-label="Decrease quantity">-</button>
+              <span class="cart-qty">Qty ${item.quantity || 1}</span>
+              <button type="button" class="cart-item-btn" data-action="increase" aria-label="Increase quantity">+</button>
+            </div>
+            <div>${formatCurrency(item.unitPrice * item.quantity)}</div>
+          </div>
+        </li>`;
+      })
+      .join("");
+
+    if (summaryEl) {
+      const ticketCount = cartItems
+        .filter((entry) => entry.category === "Ticket")
+        .reduce((sum, entry) => sum + (entry.quantity || 0), 0);
+      const merchCount = cartItems
+        .filter((entry) => entry.category === "Merch")
+        .reduce((sum, entry) => sum + (entry.quantity || 0), 0);
+      const ticketLabel = `${ticketCount} ticket${ticketCount === 1 ? "" : "s"}`;
+      const merchLabel = `${merchCount} merch item${merchCount === 1 ? "" : "s"}`;
+      summaryEl.textContent = `${ticketLabel} • ${merchLabel}`;
+    }
+  }
+
+  const totalItems = cartItems.reduce((sum, entry) => sum + (entry.quantity || 0), 0);
+  count.textContent = totalItems;
+  const total = cartItems.reduce(
+    (sum, entry) => sum + (entry.unitPrice || 0) * (entry.quantity || 0),
+    0
+  );
+  totalEl.textContent = formatCurrency(total);
+  attachCartItemHandlers();
+}
+
+function attachCartControls() {
+  if (!cartButtonEl || !cartDrawerEl) return;
+
+  cartButtonEl.addEventListener("click", () => {
+    const shouldOpen = !cartDrawerEl.classList.contains("open");
+    setCartOpen(shouldOpen);
+  });
+
+  if (cartOverlayEl) {
+    cartOverlayEl.addEventListener("click", () => setCartOpen(false));
+  }
+
+  if (cartCloseBtn) {
+    cartCloseBtn.addEventListener("click", () => setCartOpen(false));
+  }
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      setCartOpen(false);
+    }
+  });
+}
+
+function openCartDrawer() {
+  setCartOpen(true);
+}
+
+function setCartOpen(isOpen) {
+  if (!cartDrawerEl || !cartButtonEl) return;
+  cartDrawerEl.classList.toggle("open", isOpen);
+  cartButtonEl.setAttribute("aria-expanded", String(isOpen));
+  if (cartOverlayEl) {
+    cartOverlayEl.classList.toggle("open", isOpen);
+  }
+}
+
+function attachCartItemHandlers() {
+  const list = document.getElementById("cart-items");
+  if (!list) return;
+  list.querySelectorAll(".cart-item-controls").forEach((control) => {
+    const id = control.dataset.id;
+    control.addEventListener("click", (event) => {
+      const button = event.target.closest(".cart-item-btn");
+      if (!button) return;
+      const action = button.dataset.action;
+      if (action === "increase") {
+        changeCartItemQuantity(id, 1);
+      } else if (action === "decrease") {
+        changeCartItemQuantity(id, -1);
+      }
+    });
+  });
+}
+
+function changeCartItemQuantity(itemId, delta) {
+  const item = cartItems.find((entry) => entry.id === itemId);
+  if (!item) return;
+  if (delta < 0 && item.quantity === 1) {
+    const confirmed = window.confirm("Remove this item from your cart?");
+    if (!confirmed) {
+      return;
+    }
+    removeCartItem(itemId);
+    return;
+  }
+  item.quantity = Math.max(1, item.quantity + delta);
+  item.total = item.unitPrice * item.quantity;
+  renderCart();
+}
+
+function removeCartItem(itemId) {
+  const index = cartItems.findIndex((entry) => entry.id === itemId);
+  if (index === -1) return;
+  cartItems.splice(index, 1);
+  renderCart();
+}
+
+function attachMerchButtons() {
+  const buttons = document.querySelectorAll("[data-merch]");
+  buttons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const name = button.dataset.name || "Merchandise";
+      const price = Number(button.dataset.price) || 0;
+      const description = button.dataset.description || "Park store";
+      const card = button.closest(".product-card");
+      const colorGroup = card?.querySelector(".color-options");
+      const selectedColor = colorGroup?.dataset.selectedColor || "Green";
+      const selectedColorHex = colorGroup?.dataset.selectedColorHex || "#15803d";
+
+      addItemToCart({
+        category: "Merch",
+        label: name,
+        park: description,
+        quantity: 1,
+        unitPrice: price,
+        color: selectedColor,
+        colorHex: selectedColorHex,
+      });
+      pushActivity({
+        type: "Merchandise Added",
+        message: `${name} · ${selectedColor}`,
+        meta: `${formatCurrency(price)} · ${description}`,
+      });
+    });
+  });
+}
+
+function attachColorPickers() {
+  const groups = document.querySelectorAll(".color-options");
+  groups.forEach((group) => {
+    const dots = Array.from(group.querySelectorAll(".color-dot"));
+    if (!dots.length) return;
+    const defaultDot = dots.find((dot) => dot.classList.contains("active")) || dots[0];
+    const setActiveDot = (target) => {
+      dots.forEach((btn) => {
+        const isActive = btn === target;
+        btn.classList.toggle("active", isActive);
+        btn.setAttribute("aria-pressed", isActive ? "true" : "false");
+      });
+      group.dataset.selectedColor = target.dataset.colorName || "";
+      group.dataset.selectedColorHex = target.dataset.colorHex || "";
+    };
+    setActiveDot(defaultDot);
+    dots.forEach((dot) => {
+      dot.addEventListener("click", () => setActiveDot(dot));
+    });
+  });
+}
+
+function initTicketSummary() {
+  ticketSummaryEls = {
+    park: document.getElementById("summary-park"),
+    quantity: document.getElementById("summary-quantity"),
+    party: document.getElementById("summary-party"),
+    date: document.getElementById("summary-date"),
+    total: document.getElementById("summary-total"),
+  };
+  const confirmBtn = document.getElementById("ticket-confirm");
+  const ticketForm = document.getElementById("ticket-form");
+  if (confirmBtn && ticketForm) {
+    confirmBtn.addEventListener("click", () => {
+      if (!ticketForm.checkValidity()) {
+        ticketForm.reportValidity();
+        return;
+      }
+      ticketForm.requestSubmit();
+    });
+  }
+  updateTicketSummary();
+}
+
+function updateTicketSummary() {
+  const ticketForm = document.getElementById("ticket-form");
+  if (!ticketForm) return;
+  const { park, quantity, party, date, total } = ticketSummaryEls;
+  if (!park || !quantity || !party || !date || !total) return;
+  const data = new FormData(ticketForm);
+  const parkName = data.get("park") || "Not selected";
+  const adults = Number(data.get("adults")) || 0;
+  const kids = Number(data.get("kids")) || 0;
+  const visitDate = data.get("date");
+  const ticketCount = adults + kids;
+  const amount = calculateTicketPrice(adults, kids);
+
+  park.textContent = parkName;
+  quantity.textContent = `${ticketCount} ticket${ticketCount === 1 ? "" : "s"}`;
+  party.textContent = `${adults} adults · ${kids} kids`;
+  date.textContent = visitDate ? formatDate(visitDate) : "Not set";
+  total.textContent = formatCurrency(amount);
+}
+
 function formatDate(value) {
   if (!value) return "TBD";
   const date = new Date(value);
@@ -125,15 +407,76 @@ function formatDate(value) {
 }
 
 function formatCurrency(amount) {
-  return new Intl.NumberFormat("en-US", {
+  return new Intl.NumberFormat("en-MY", {
     style: "currency",
-    currency: "USD",
+    currency: "MYR",
     minimumFractionDigits: 2,
   }).format(amount || 0);
 }
 
 function calculateTicketPrice(adults, kids) {
-  const adultPrice = 45;
-  const kidPrice = 25;
-  return adults * adultPrice + kids * kidPrice;
+  return adults * ADULT_TICKET_PRICE + kids * CHILD_TICKET_PRICE;
+}
+
+function describeCartItem(item) {
+  if (item.category === "Merch") {
+    const details = [];
+    if (item.color) details.push(`Color: ${item.color}`);
+    if (item.park) details.push(item.park);
+    return details.join(" · ") || "Park store";
+  }
+
+  const parts = [];
+  if (item.park) parts.push(item.park);
+  const schedule = [item.date ? formatDate(item.date) : "", item.time || ""].filter(Boolean).join(" ");
+  if (schedule) parts.push(schedule.trim());
+  return parts.join(" · ") || "Ticket";
+}
+
+function renderColorBadge(item) {
+  if (!item.color) {
+    return "";
+  }
+  const swatch = item.colorHex || "#15803d";
+  return `<span class="cart-color"><span class="cart-color-dot" style="--swatch-color:${swatch}"></span>${item.color}</span>`;
+}
+
+function summarizeCartQuantity(item) {
+  if (item.category === "Merch") {
+    return "";
+  }
+  if (item.category === "Ticket") {
+    const type = item.ticketType || "Ticket";
+    return `${type} · 1 pax`;
+  }
+  const adults = Number.isFinite(item.adults) ? item.adults : 0;
+  const kids = Number.isFinite(item.kids) ? item.kids : 0;
+  return `${adults} adult(s) / ${kids} kid(s)`;
+}
+
+function addTicketEntriesToCart({ park, date, time, adults, kids }) {
+  for (let i = 0; i < adults; i += 1) {
+    addItemToCart({
+      category: "Ticket",
+      label: `${park || "Park"} · Adult ticket`,
+      park,
+      date,
+      time,
+      ticketType: "Adult",
+      quantity: 1,
+      unitPrice: ADULT_TICKET_PRICE,
+    });
+  }
+  for (let i = 0; i < kids; i += 1) {
+    addItemToCart({
+      category: "Ticket",
+      label: `${park || "Park"} · Child ticket`,
+      park,
+      date,
+      time,
+      ticketType: "Child",
+      quantity: 1,
+      unitPrice: CHILD_TICKET_PRICE,
+    });
+  }
 }

@@ -19,20 +19,20 @@
         State National Parks
       </div>
         <nav class="nav-links">
-          <a href="homepage.html#access">Access</a>
-          <a href="homepage.html#tickets">Tickets</a>
-          <a href="homepage.html#reviews">Reviews</a>
+        <a href="homepage.html#access">Home</a>
+            <a href="homepage.html#tickets">Tickets</a>
+            <a href="homepage.html#my-tickets">My Tickets</a>
           <a href="merchandise.html">Merchandise</a>
           <a href="signin.html" class="btn ghost small">Sign in</a>
           <a href="signup.html" class="btn primary small">Create account</a>
         </nav>
       </header>
 
-      <section
-        class="hero hero-banner hero-full"
-        id="overview"
-        style="--hero-image: url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=2000&q=80');"
-      ></section>
+        <section
+          class="hero hero-banner hero-full"
+          id="overview"
+          style="--hero-image: url('images/nationalpark.jpeg');"
+        ></section>
 
       <main>
         <section id="access">
@@ -55,20 +55,24 @@
         <section id="tickets">
           <div class="section-heading">
             <p class="eyebrow">Ticket operations</p>
-            <h2>Purchase, cancel, or refund park visits</h2>
+            <h2>Book your ticket</h2>
           </div>
-        <div class="forms-grid ticket-forms">
-          <article class="form-card">
-            <h3>Purchase Ticket</h3>
-            <form id="ticket-form">
-              <label>
-                Park name
-                <input type="text" name="park" placeholder="Skyline Canyon" required />
-              </label>
-              <label>
-                Ticket type
-                <input type="text" name="type" placeholder="Explorer Pass" required />
-              </label>
+          <div class="forms-grid ticket-forms">
+            <article class="form-card">
+              <h3>Purchase Ticket</h3>
+              <p class="muted price-note">Adults RM45 · Children RM25</p>
+              <form id="ticket-form">
+                <label>
+                  Park name
+                  <select name="park" required>
+                    <option value="">Choose a park</option>
+                    <option>Skyline Canyon</option>
+                    <option>Evergreen Reserve</option>
+                    <option>Meadow Basin</option>
+                    <option>Sunset Ridge</option>
+                    <option>Crystal Falls</option>
+                  </select>
+                </label>
               <div class="ticket-form-grid">
                 <label>
                   Visit date
@@ -89,42 +93,111 @@
                   <input type="number" name="kids" min="0" value="1" required />
                 </label>
               </div>
-              <label>
-                Notes
-                <textarea name="notes" rows="2" placeholder="Optional details"></textarea>
-              </label>
-              <button type="submit" class="btn primary">Queue purchase</button>
+                <label>
+                  Notes
+                  <textarea name="notes" rows="2" placeholder="Optional details"></textarea>
+                </label>
             </form>
           </article>
 
-          <article class="form-card">
-            <h3>Cancel / Refund Ticket</h3>
-            <form id="cancel-form">
-              <label>
-                Order ID
-                <input type="text" name="orderID" placeholder="ORD-12345" required />
-              </label>
-              <label>
-                Ticket ID
-                <input type="text" name="ticketID" placeholder="TCK-987" required />
-              </label>
-              <label>
-                Action
-                <select name="action" required>
-                  <option value="">Choose</option>
-                  <option value="cancel">Cancel upcoming visit</option>
-                  <option value="refund">Request refund</option>
-                </select>
-              </label>
-                <label>
-                  Reason (optional)
-                  <textarea name="reason" rows="3" placeholder="Optional details"></textarea>
-                </label>
-              <button type="submit" class="btn secondary">Submit request</button>
-            </form>
+            <article class="form-card ticket-summary-card compact">
+              <h3>Your summary</h3>
+              <ul class="summary-list">
+                <li>
+                  <span>Park</span>
+                  <strong id="summary-park">Not selected</strong>
+                </li>
+                <li>
+                  <span>Quantity</span>
+                  <strong id="summary-quantity">0 tickets</strong>
+                </li>
+                <li>
+                  <span>Party</span>
+                  <strong id="summary-party">0 adults · 0 kids</strong>
+                </li>
+                <li>
+                  <span>Date</span>
+                  <strong id="summary-date">Not set</strong>
+                </li>
+                <li>
+                  <span>Total</span>
+                  <strong id="summary-total">RM0.00</strong>
+                </li>
+              </ul>
+              <button type="button" class="btn primary" id="ticket-confirm">Confirm</button>
           </article>
         </div>
+        
       </section>
+
+        <section id="my-tickets">
+          <div class="section-heading">
+            <p class="eyebrow">My tickets</p>
+            <h2>Check the status of tickets you have requested</h2>
+            <p class="muted">
+              Once a request is submitted, it lands here with the latest confirmation or refund status from the system.
+            </p>
+          </div>
+          <div class="ticket-summary-grid">
+            <article class="ticket-summary-card">
+              <header>
+                <h3>Explorer Pass</h3>
+                <span class="ticket-status success">Confirmed</span>
+              </header>
+              <p class="muted">Skyline Canyon · 12 Jan 2026 · 09:00</p>
+              <dl>
+                <div>
+                  <dt>Party</dt>
+                  <dd>2 adults · 1 kid</dd>
+                </div>
+                <div>
+                  <dt>Order ID</dt>
+                  <dd>ORD-48211</dd>
+                </div>
+              </dl>
+              <button type="button" class="btn ghost small">View receipt</button>
+            </article>
+
+            <article class="ticket-summary-card">
+              <header>
+                <h3>Night Safari</h3>
+                <span class="ticket-status warning">Pending</span>
+              </header>
+              <p class="muted">Evergreen Reserve · 20 Jan 2026 · 19:30</p>
+              <dl>
+                <div>
+                  <dt>Party</dt>
+                  <dd>1 adult</dd>
+                </div>
+                <div>
+                  <dt>Order ID</dt>
+                  <dd>ORD-48289</dd>
+                </div>
+              </dl>
+              <button type="button" class="btn ghost small">Cancel / refund</button>
+            </article>
+
+            <article class="ticket-summary-card">
+              <header>
+                <h3>Family Adventure</h3>
+                <span class="ticket-status danger">Refunded</span>
+              </header>
+              <p class="muted">Meadow Basin · 05 Feb 2026 · 10:15</p>
+              <dl>
+                <div>
+                  <dt>Party</dt>
+                  <dd>2 adults · 2 kids</dd>
+                </div>
+                <div>
+                  <dt>Order ID</dt>
+                  <dd>ORD-48340</dd>
+                </div>
+              </dl>
+              <button type="button" class="btn ghost small">Download receipt</button>
+            </article>
+          </div>
+          
+        </section>
 
         <section id="reviews">
           <div class="section-heading">
@@ -169,36 +242,41 @@
       </section>
     </main>
 
-      <button class="cart-fab" id="cart-button" aria-haspopup="true" aria-expanded="false">
-        <span class="sr-only">View cart</span>
-        <span class="cart-count" id="cart-count">0</span>
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path
-            d="M7 4h-2l-1 2m0 0-2 4h3l1.5-3H19l-2 6H9l-1 2h11"
-            stroke="currentColor"
-            stroke-width="1.5"
-            fill="none"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-          <circle cx="10" cy="21" r="1.4" />
-          <circle cx="17" cy="21" r="1.4" />
-        </svg>
-      </button>
-      <div class="cart-drawer" id="cart-drawer" aria-live="polite">
-        <div class="cart-header">
-          <h3>Cart preview</h3>
-          <p class="muted">Tickets added from the purchase form</p>
-        </div>
-        <ul id="cart-items" class="cart-items"></ul>
-        <div class="cart-footer">
-          <div>
-            <p class="muted">Estimated total</p>
-            <strong id="cart-total">$0.00</strong>
+        <button class="cart-fab" id="cart-button" aria-haspopup="true" aria-expanded="false">
+          <span class="sr-only">View cart</span>
+          <span class="cart-count" id="cart-count">0</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M7 4h-2l-1 2m0 0-2 4h3l1.5-3H19l-2 6H9l-1 2h11"
+              stroke="currentColor"
+              stroke-width="1.5"
+              fill="none"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <circle cx="10" cy="21" r="1.4" />
+            <circle cx="17" cy="21" r="1.4" />
+          </svg>
+        </button>
+        <div class="cart-overlay" id="cart-overlay"></div>
+        <aside class="cart-drawer" id="cart-drawer" aria-live="polite">
+          <div class="cart-header">
+            <div>
+              <p class="eyebrow">Cart</p>
+              <h3>Items ready to checkout</h3>
+            </div>
+            <button type="button" class="cart-close" id="cart-close" aria-label="Close cart">×</button>
           </div>
-          <button class="btn secondary" type="button">Checkout</button>
-        </div>
-      </div>
+          <div class="cart-summary" id="cart-summary">No items in cart</div>
+          <ul id="cart-items" class="cart-items"></ul>
+          <div class="cart-footer">
+            <div>
+              <p class="muted">Estimated total</p>
+              <strong id="cart-total">RM0.00</strong>
+            </div>
+            <button class="btn secondary" type="button">Checkout</button>
+          </div>
+        </aside>
 
       <footer>
       <div>

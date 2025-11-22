@@ -19,9 +19,9 @@
         State National Parks
       </div>
       <nav class="nav-links">
-        <a href="homepage.html#access">Access</a>
+        <a href="homepage.html#access">Home</a>
         <a href="homepage.html#tickets">Tickets</a>
-        <a href="homepage.html#reviews">Reviews</a>
+        <a href="homepage.html#my-tickets">My Tickets</a>
         <a href="merchandise.html">Merchandise</a>
         <a href="signin.html" class="btn ghost small">Sign in</a>
         <a href="signup.html" class="btn primary small">Create account</a>
@@ -38,17 +38,37 @@
       <section class="merch-grid-section">
         <div class="product-grid">
           <article class="product-card">
-            <img src="images/totebag.jpeg" alt="Tote bag" />
+            <img src="images/totebag.jpeg" alt="Tote Bag" />
             <div class="product-content">
               <h3>Tote Bag</h3>
-              <div class="color-options">
-                <span class="color-dot" style="background:#1e293b"></span>
-                <span class="color-dot" style="background:#f97316"></span>
-                <span class="color-dot" style="background:#65a30d"></span>
-              </div>
+                <div class="color-options" role="group" aria-label="Tote Bag colors">
+                  <button
+                    type="button"
+                    class="color-dot active"
+                    data-color-name="Green"
+                    data-color-hex="#15803d"
+                    style="--swatch-color:#15803d"
+                    aria-pressed="true"
+                  ></button>
+                  <button
+                    type="button"
+                    class="color-dot"
+                    data-color-name="Yellow"
+                    data-color-hex="#facc15"
+                    style="--swatch-color:#facc15"
+                    aria-pressed="false"
+                  ></button>
+                  <button
+                    type="button"
+                    class="color-dot"
+                    data-color-name="Blue"
+                    data-color-hex="#0ea5e9"
+                    style="--swatch-color:#0ea5e9"
+                    aria-pressed="false"
+                  ></button>
+                </div>
               <div class="price-row">
-                <span class="old-price">$39</span>
-                <span class="new-price">$32</span>
+                <span class="new-price">RM32</span>
               </div>
               <button
                 class="btn merch-btn"
@@ -63,253 +83,452 @@
             </div>
           </article>
 
-          <article class="product-card">
-            <img src="images/keychain.jpeg" alt="Keychain" />
-            <div class="product-content">
-              <h3>Keychain</h3>
-              <div class="color-options">
-                <span class="color-dot" style="background:#fcd34d"></span>
-                <span class="color-dot" style="background:#14b8a6"></span>
-                <span class="color-dot" style="background:#94a3b8"></span>
+            <article class="product-card">
+              <img src="images/keychain.jpeg" alt="Keychain" />
+              <div class="product-content">
+                <h3>Keychain</h3>
+                  <div class="color-options" role="group" aria-label="Keychain colors">
+                    <button
+                      type="button"
+                      class="color-dot active"
+                      data-color-name="Green"
+                      data-color-hex="#15803d"
+                      style="--swatch-color:#15803d"
+                      aria-pressed="true"
+                    ></button>
+                    <button
+                      type="button"
+                      class="color-dot"
+                      data-color-name="Yellow"
+                      data-color-hex="#facc15"
+                      style="--swatch-color:#facc15"
+                      aria-pressed="false"
+                    ></button>
+                    <button
+                      type="button"
+                      class="color-dot"
+                      data-color-name="Blue"
+                      data-color-hex="#0ea5e9"
+                      style="--swatch-color:#0ea5e9"
+                      aria-pressed="false"
+                    ></button>
+                  </div>
+                  <div class="price-row">
+                    <span class="new-price">RM12</span>
+                  </div>
+                <button
+                  class="btn merch-btn"
+                  type="button"
+                  data-merch
+                  data-name="Keychain"
+                  data-price="12"
+                  data-description="Park store"
+                >
+                  Add to Cart
+                </button>
               </div>
-              <div class="price-row">
-                <span class="old-price">$15</span>
-                <span class="new-price">$12</span>
+            </article>
+
+            <article class="product-card">
+              <img src="images/umbrella.jpeg" alt="Umbrella" />
+              <div class="product-content">
+                <h3>Umbrella</h3>
+                  <div class="color-options" role="group" aria-label="Umbrella colors">
+                    <button
+                      type="button"
+                      class="color-dot active"
+                      data-color-name="Green"
+                      data-color-hex="#15803d"
+                      style="--swatch-color:#15803d"
+                      aria-pressed="true"
+                    ></button>
+                    <button
+                      type="button"
+                      class="color-dot"
+                      data-color-name="Yellow"
+                      data-color-hex="#facc15"
+                      style="--swatch-color:#facc15"
+                      aria-pressed="false"
+                    ></button>
+                    <button
+                      type="button"
+                      class="color-dot"
+                      data-color-name="Blue"
+                      data-color-hex="#0ea5e9"
+                      style="--swatch-color:#0ea5e9"
+                      aria-pressed="false"
+                    ></button>
+                  </div>
+                  <div class="price-row">
+                    <span class="new-price">RM28</span>
+                  </div>
+                <button
+                  class="btn merch-btn"
+                  type="button"
+                  data-merch
+                  data-name="Umbrella"
+                  data-price="28"
+                  data-description="Park store"
+                >
+                  Add to Cart
+                </button>
               </div>
-              <button
-                class="btn merch-btn"
-                type="button"
-                data-merch
-                data-name="Keychain"
-                data-price="12"
-                data-description="Park store"
-              >
-                Add to Cart
-              </button>
-            </div>
-          </article>
+            </article>
+
+            <article class="product-card">
+              <img src="images/bottle.jpeg" alt="Insulated Bottle" />
+              <div class="product-content">
+                <h3>Insulated Bottle</h3>
+                  <div class="color-options" role="group" aria-label="Bottle colors">
+                    <button
+                      type="button"
+                      class="color-dot active"
+                      data-color-name="Green"
+                      data-color-hex="#15803d"
+                      style="--swatch-color:#15803d"
+                      aria-pressed="true"
+                    ></button>
+                    <button
+                      type="button"
+                      class="color-dot"
+                      data-color-name="Yellow"
+                      data-color-hex="#facc15"
+                      style="--swatch-color:#facc15"
+                      aria-pressed="false"
+                    ></button>
+                    <button
+                      type="button"
+                      class="color-dot"
+                      data-color-name="Blue"
+                      data-color-hex="#0ea5e9"
+                      style="--swatch-color:#0ea5e9"
+                      aria-pressed="false"
+                    ></button>
+                  </div>
+                  <div class="price-row">
+                    <span class="new-price">RM24</span>
+                  </div>
+                <button
+                  class="btn merch-btn"
+                  type="button"
+                  data-merch
+                  data-name="Insulated Bottle"
+                  data-price="24"
+                  data-description="Park store"
+                >
+                  Add to Cart
+                </button>
+              </div>
+            </article>
+
+            <article class="product-card">
+              <img src="images/socks.jpeg" alt="Socks" />
+              <div class="product-content">
+                <h3>Socks</h3>
+                  <div class="color-options" role="group" aria-label="Socks colors">
+                    <button
+                      type="button"
+                      class="color-dot active"
+                      data-color-name="Green"
+                      data-color-hex="#15803d"
+                      style="--swatch-color:#15803d"
+                      aria-pressed="true"
+                    ></button>
+                    <button
+                      type="button"
+                      class="color-dot"
+                      data-color-name="Yellow"
+                      data-color-hex="#facc15"
+                      style="--swatch-color:#facc15"
+                      aria-pressed="false"
+                    ></button>
+                    <button
+                      type="button"
+                      class="color-dot"
+                      data-color-name="Blue"
+                      data-color-hex="#0ea5e9"
+                      style="--swatch-color:#0ea5e9"
+                      aria-pressed="false"
+                    ></button>
+                  </div>
+                  <div class="price-row">
+                    <span class="new-price">RM14</span>
+                  </div>
+                <button
+                  class="btn merch-btn"
+                  type="button"
+                  data-merch
+                  data-name="Socks"
+                  data-price="14"
+                  data-description="Park store"
+                >
+                  Add to Cart
+                </button>
+              </div>
+            </article>
+
+            <article class="product-card">
+              <img src="images/magnet.jpeg" alt="Fridge Magnet" />
+              <div class="product-content">
+                <h3>Fridge Magnet</h3>
+                  <div class="color-options" role="group" aria-label="Fridge magnet colors">
+                    <button
+                      type="button"
+                      class="color-dot active"
+                      data-color-name="Green"
+                      data-color-hex="#15803d"
+                      style="--swatch-color:#15803d"
+                      aria-pressed="true"
+                    ></button>
+                    <button
+                      type="button"
+                      class="color-dot"
+                      data-color-name="Yellow"
+                      data-color-hex="#facc15"
+                      style="--swatch-color:#facc15"
+                      aria-pressed="false"
+                    ></button>
+                    <button
+                      type="button"
+                      class="color-dot"
+                      data-color-name="Blue"
+                      data-color-hex="#0ea5e9"
+                      style="--swatch-color:#0ea5e9"
+                      aria-pressed="false"
+                    ></button>
+                  </div>
+                  <div class="price-row">
+                    <span class="new-price">RM8</span>
+                  </div>
+                <button
+                  class="btn merch-btn"
+                  type="button"
+                  data-merch
+                  data-name="Fridge Magnet"
+                  data-price="8"
+                  data-description="Park store"
+                >
+                  Add to Cart
+                </button>
+              </div>
+            </article>
+
+            <article class="product-card">
+              <img src="images/pens.jpeg" alt="Pens" />
+              <div class="product-content">
+                <h3>Pens</h3>
+                  <div class="color-options" role="group" aria-label="Pen colors">
+                    <button
+                      type="button"
+                      class="color-dot active"
+                      data-color-name="Green"
+                      data-color-hex="#15803d"
+                      style="--swatch-color:#15803d"
+                      aria-pressed="true"
+                    ></button>
+                    <button
+                      type="button"
+                      class="color-dot"
+                      data-color-name="Yellow"
+                      data-color-hex="#facc15"
+                      style="--swatch-color:#facc15"
+                      aria-pressed="false"
+                    ></button>
+                    <button
+                      type="button"
+                      class="color-dot"
+                      data-color-name="Blue"
+                      data-color-hex="#0ea5e9"
+                      style="--swatch-color:#0ea5e9"
+                      aria-pressed="false"
+                    ></button>
+                  </div>
+                  <div class="price-row">
+                    <span class="new-price">RM13</span>
+                  </div>
+                <button
+                  class="btn merch-btn"
+                  type="button"
+                  data-merch
+                  data-name="Pens"
+                  data-price="13"
+                  data-description="Park store"
+                >
+                  Add to Cart
+                </button>
+              </div>
+            </article>
+
+            <article class="product-card">
+              <img src="images/notebook.jpeg" alt="Notebook" />
+              <div class="product-content">
+                <h3>Notebook</h3>
+                  <div class="color-options" role="group" aria-label="Notebook colors">
+                    <button
+                      type="button"
+                      class="color-dot active"
+                      data-color-name="Green"
+                      data-color-hex="#15803d"
+                      style="--swatch-color:#15803d"
+                      aria-pressed="true"
+                    ></button>
+                    <button
+                      type="button"
+                      class="color-dot"
+                      data-color-name="Yellow"
+                      data-color-hex="#facc15"
+                      style="--swatch-color:#facc15"
+                      aria-pressed="false"
+                    ></button>
+                    <button
+                      type="button"
+                      class="color-dot"
+                      data-color-name="Blue"
+                      data-color-hex="#0ea5e9"
+                      style="--swatch-color:#0ea5e9"
+                      aria-pressed="false"
+                    ></button>
+                  </div>
+                  <div class="price-row">
+                    <span class="new-price">RM18</span>
+                  </div>
+                <button
+                  class="btn merch-btn"
+                  type="button"
+                  data-merch
+                  data-name="Notebook"
+                  data-price="18"
+                  data-description="Park store"
+                >
+                  Add to Cart
+                </button>
+              </div>
+            </article>
+
+            <article class="product-card">
+              <img src="images/hoodie.jpeg" alt="Hoodie" />
+              <div class="product-content">
+                <h3>Hoodie</h3>
+                  <div class="color-options" role="group" aria-label="Hoodie colors">
+                    <button
+                      type="button"
+                      class="color-dot active"
+                      data-color-name="Green"
+                      data-color-hex="#15803d"
+                      style="--swatch-color:#15803d"
+                      aria-pressed="true"
+                    ></button>
+                    <button
+                      type="button"
+                      class="color-dot"
+                      data-color-name="Yellow"
+                      data-color-hex="#facc15"
+                      style="--swatch-color:#facc15"
+                      aria-pressed="false"
+                    ></button>
+                    <button
+                      type="button"
+                      class="color-dot"
+                      data-color-name="Blue"
+                      data-color-hex="#0ea5e9"
+                      style="--swatch-color:#0ea5e9"
+                      aria-pressed="false"
+                    ></button>
+                  </div>
+                  <div class="price-row">
+                    <span class="new-price">RM62</span>
+                  </div>
+                <button
+                  class="btn merch-btn"
+                  type="button"
+                  data-merch
+                  data-name="Hoodie"
+                  data-price="62"
+                  data-description="Park store"
+                >
+                  Add to Cart
+                </button>
+              </div>
+            </article>
+
+            <article class="product-card">
+              <img src="images/tshirt.jpeg" alt="T-Shirt" />
+              <div class="product-content">
+                <h3>T-Shirt</h3>
+                  <div class="color-options" role="group" aria-label="T-shirt colors">
+                    <button
+                      type="button"
+                      class="color-dot active"
+                      data-color-name="Green"
+                      data-color-hex="#15803d"
+                      style="--swatch-color:#15803d"
+                      aria-pressed="true"
+                    ></button>
+                    <button
+                      type="button"
+                      class="color-dot"
+                      data-color-name="Yellow"
+                      data-color-hex="#facc15"
+                      style="--swatch-color:#facc15"
+                      aria-pressed="false"
+                    ></button>
+                    <button
+                      type="button"
+                      class="color-dot"
+                      data-color-name="Blue"
+                      data-color-hex="#0ea5e9"
+                      style="--swatch-color:#0ea5e9"
+                      aria-pressed="false"
+                    ></button>
+                  </div>
+                  <div class="price-row">
+                    <span class="new-price">RM24</span>
+                  </div>
+                <button
+                  class="btn merch-btn"
+                  type="button"
+                  data-merch
+                  data-name="T-Shirt"
+                  data-price="24"
+                  data-description="Park store"
+                >
+                  Add to Cart
+                </button>
+              </div>
+            </article>
 
           <article class="product-card">
-            <img src="images/umbrella.jpeg" />
-            <div class="product-content">
-              <h3>Umbrella</h3>
-              <div class="color-options">
-                <span class="color-dot" style="background:#60a5fa"></span>
-                <span class="color-dot" style="background:#f472b6"></span>
-                <span class="color-dot" style="background:#d946ef"></span>
-              </div>
-              <div class="price-row">
-                <span class="old-price">$32</span>
-                <span class="new-price">$28</span>
-              </div>
-              <button
-                class="btn merch-btn"
-                type="button"
-                data-merch
-                data-name="Umbrella"
-                data-price="28"
-                data-description="Park store"
-              >
-                Add to Cart
-              </button>
-            </div>
-          </article>
-
-          <article class="product-card">
-            <img src="images/bottle.jpeg" alt="Insulated Bottle" />
-            <div class="product-content">
-              <h3>Insulated Bottle</h3>
-              <div class="color-options">
-                <span class="color-dot" style="background:#2563eb"></span>
-                <span class="color-dot" style="background:#0ea5e9"></span>
-                <span class="color-dot" style="background:#fde047"></span>
-              </div>
-              <div class="price-row">
-                <span class="old-price">$29</span>
-                <span class="new-price">$24</span>
-              </div>
-              <button
-                class="btn merch-btn"
-                type="button"
-                data-merch
-                data-name="Insulated Bottle"
-                data-price="24"
-                data-description="Park store"
-              >
-                Add to Cart
-              </button>
-            </div>
-          </article>
-
-          <article class="product-card">
-            <img src="images/socks.jpeg" alt="Socks" />
-            <div class="product-content">
-              <h3>Socks</h3>
-              <div class="color-options">
-                <span class="color-dot" style="background:#0f172a"></span>
-                <span class="color-dot" style="background:#6366f1"></span>
-                <span class="color-dot" style="background:#e11d48"></span>
-              </div>
-              <div class="price-row">
-                <span class="old-price">$18</span>
-                <span class="new-price">$14</span>
-              </div>
-              <button
-                class="btn merch-btn"
-                type="button"
-                data-merch
-                data-name="Socks"
-                data-price="14"
-                data-description="Park store"
-              >
-                Add to Cart
-              </button>
-            </div>
-          </article>
-
-          <article class="product-card">
-            <img src="images/magnet.jpeg" alt="Fridge Magnet" />
-            <div class="product-content">
-              <h3>Fridge Magnet</h3>
-              <div class="color-options">
-                <span class="color-dot" style="background:#f0abfc"></span>
-                <span class="color-dot" style="background:#fb7185"></span>
-                <span class="color-dot" style="background:#facc15"></span>
-              </div>
-              <div class="price-row">
-                <span class="old-price">$10</span>
-                <span class="new-price">$8</span>
-              </div>
-              <button
-                class="btn merch-btn"
-                type="button"
-                data-merch
-                data-name="Fridge Magnet"
-                data-price="8"
-                data-description="Park store"
-              >
-                Add to Cart
-              </button>
-            </div>
-          </article>
-
-          <article class="product-card">
-            <img src="images/pens.jpeg" alt="Pens" />
-            <div class="product-content">
-              <h3>Pens</h3>
-              <div class="color-options">
-                <span class="color-dot" style="background:#38bdf8"></span>
-                <span class="color-dot" style="background:#fca5a5"></span>
-                <span class="color-dot" style="background:#a7f3d0"></span>
-              </div>
-              <div class="price-row">
-                <span class="old-price">$16</span>
-                <span class="new-price">$13</span>
-              </div>
-              <button
-                class="btn merch-btn"
-                type="button"
-                data-merch
-                data-name="Pens"
-                data-price="13"
-                data-description="Park store"
-              >
-                Add to Cart
-              </button>
-            </div>
-          </article>
-
-          <article class="product-card">
-            <img src="images/notebook.jpeg" alt="Notebook" />
-            <div class="product-content">
-              <h3>Notebook</h3>
-              <div class="color-options">
-                <span class="color-dot" style="background:#1e40af"></span>
-                <span class="color-dot" style="background:#f43f5e"></span>
-                <span class="color-dot" style="background:#fcd34d"></span>
-              </div>
-              <div class="price-row">
-                <span class="old-price">$22</span>
-                <span class="new-price">$18</span>
-              </div>
-              <button
-                class="btn merch-btn"
-                type="button"
-                data-merch
-                data-name="Notebook"
-                data-price="18"
-                data-description="Park store"
-              >
-                Add to Cart
-              </button>
-            </div>
-          </article>
-
-          <article class="product-card">
-            <img src="images/hoodie.jpeg" alt="Hoodie" />
-            <div class="product-content">
-              <h3>Hoodie</h3>
-              <div class="color-options">
-                <span class="color-dot" style="background:#111827"></span>
-                <span class="color-dot" style="background:#6b21a8"></span>
-                <span class="color-dot" style="background:#0ea5e9"></span>
-              </div>
-              <div class="price-row">
-                <span class="old-price">$75</span>
-                <span class="new-price">$62</span>
-              </div>
-              <button
-                class="btn merch-btn"
-                type="button"
-                data-merch
-                data-name="Hoodie"
-                data-price="62"
-                data-description="Park store"
-              >
-                Add to Cart
-              </button>
-            </div>
-          </article>
-
-          <article class="product-card">
-            <img src="images/tshirt.jpeg" alt="T-Shirt" />
-            <div class="product-content">
-              <h3>T-Shirt</h3>
-              <div class="color-options">
-                <span class="color-dot" style="background:#0f172a"></span>
-                <span class="color-dot" style="background:#f43f5e"></span>
-                <span class="color-dot" style="background:#facc15"></span>
-              </div>
-              <div class="price-row">
-                <span class="old-price">$30</span>
-                <span class="new-price">$24</span>
-              </div>
-              <button
-                class="btn merch-btn"
-                type="button"
-                data-merch
-                data-name="T-Shirt"
-                data-price="24"
-                data-description="Park store"
-              >
-                Add to Cart
-              </button>
-            </div>
-          </article>
-
-          <article class="product-card">
-            <img src="images/mug.jpeg
-            " alt="Mug" />
+            <img src="images/mug.jpeg" alt="Mug" />
             <div class="product-content">
               <h3>Mug</h3>
-              <div class="color-options">
-                <span class="color-dot" style="background:#d4d4d4"></span>
-                <span class="color-dot" style="background:#f43f5e"></span>
-                <span class="color-dot" style="background:#22d3ee"></span>
-              </div>
+                <div class="color-options" role="group" aria-label="Mug colors">
+                  <button
+                    type="button"
+                    class="color-dot active"
+                    data-color-name="Green"
+                    data-color-hex="#15803d"
+                    style="--swatch-color:#15803d"
+                    aria-pressed="true"
+                  ></button>
+                  <button
+                    type="button"
+                    class="color-dot"
+                    data-color-name="Yellow"
+                    data-color-hex="#facc15"
+                    style="--swatch-color:#facc15"
+                    aria-pressed="false"
+                  ></button>
+                  <button
+                    type="button"
+                    class="color-dot"
+                    data-color-name="Blue"
+                    data-color-hex="#0ea5e9"
+                    style="--swatch-color:#0ea5e9"
+                    aria-pressed="false"
+                  ></button>
+                </div>
               <div class="price-row">
-                <span class="old-price">$28</span>
-                <span class="new-price">$22</span>
+                <span class="new-price">RM22</span>
               </div>
               <button
                 class="btn merch-btn"
@@ -397,22 +616,27 @@
         />
         <circle cx="10" cy="21" r="1.4" />
         <circle cx="17" cy="21" r="1.4" />
-      </svg>
-    </button>
-    <div class="cart-drawer" id="cart-drawer" aria-live="polite">
-      <div class="cart-header">
-        <h3>Cart preview</h3>
-        <p class="muted">Tickets or merchandise added while browsing</p>
-      </div>
-      <ul id="cart-items" class="cart-items"></ul>
-      <div class="cart-footer">
-        <div>
-          <p class="muted">Estimated total</p>
-          <strong id="cart-total">$0.00</strong>
+        </svg>
+      </button>
+      <div class="cart-overlay" id="cart-overlay"></div>
+      <aside class="cart-drawer" id="cart-drawer" aria-live="polite">
+        <div class="cart-header">
+          <div>
+            <p class="eyebrow">Cart</p>
+            <h3>Items ready to checkout</h3>
+          </div>
+          <button type="button" class="cart-close" id="cart-close" aria-label="Close cart">×</button>
         </div>
-        <button class="btn secondary" type="button">Checkout</button>
-      </div>
-    </div>
+        <div class="cart-summary" id="cart-summary">No items in cart</div>
+        <ul id="cart-items" class="cart-items"></ul>
+        <div class="cart-footer">
+          <div>
+            <p class="muted">Estimated total</p>
+            <strong id="cart-total">RM0.00</strong>
+          </div>
+          <button class="btn secondary" type="button">Checkout</button>
+        </div>
+      </aside>
 
     <footer>
       <div>
