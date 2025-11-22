@@ -691,39 +691,91 @@ section {
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1rem;
+}
+
+.orders-hero-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  position: relative;
 }
 
 .orders-hero h1 {
   margin: 0;
+  flex: 1;
 }
 
-.orders-filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-.orders-filter {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  font-size: 0.9rem;
-}
-
-.orders-filter span {
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-size: 0.75rem;
+.orders-sort-btn {
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--border);
+  border-radius: 0.85rem;
+  background: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
   color: var(--muted);
 }
 
-.orders-filter select {
-  border: 1px solid var(--border);
-  border-radius: 0.7rem;
-  padding: 0.5rem 0.85rem;
-  font-size: 0.95rem;
+.orders-sort-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.orders-sort-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.5rem);
   background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 0.85rem;
+  box-shadow: var(--shadow);
+  padding: 0.75rem;
+  display: none;
+  flex-direction: column;
+  gap: 0.4rem;
+  min-width: 220px;
+  z-index: 10;
+}
+
+.orders-sort-menu.open {
+  display: flex;
+}
+
+.orders-sort-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.orders-sort-option input {
+  accent-color: var(--accent);
+}
+
+.orders-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.orders-tab {
+  padding: 0.9rem 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  background: rgba(15, 23, 42, 0.02);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.orders-tab.active {
+  background: rgba(60, 122, 74, 0.12);
+  border-color: rgba(60, 122, 74, 0.4);
+  color: var(--accent-strong);
 }
 
 .orders-archive {

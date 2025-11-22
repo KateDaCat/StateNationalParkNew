@@ -37,6 +37,9 @@ let ordersHintEl;
 let ordersHintTextEl;
 let ordersViewAllBtn;
 let ordersSortEl;
+let ordersSortTriggerEl;
+let ordersSortMenuEl;
+let ordersViewFilter = "upcoming";
 let cancelModalEl;
 let cancelModalFormEl;
 let cancelModalReasonEl;
@@ -617,7 +620,10 @@ function initOrders() {
   ordersHintTextEl = document.getElementById("orders-hint-text");
   ordersViewAllBtn = document.getElementById("orders-view-all");
   ordersSortEl = document.getElementById("orders-sort");
+  ordersSortTriggerEl = document.getElementById("orders-sort-trigger");
+  ordersSortMenuEl = document.getElementById("orders-sort-menu");
   renderOrders();
+  attachOrdersFilterControls();
 }
 
 function renderOrders() {
@@ -645,8 +651,9 @@ function renderOrders() {
 function renderOrdersInto({ listEl, emptyEl, limit }) {
   if (!listEl || !emptyEl) return;
   const sorted = getSortedOrders();
+  const filtered = filterOrdersByView(sorted);
   const entries =
-    typeof limit === "number" && Number.isFinite(limit) ? sorted.slice(0, limit) : sorted;
+    typeof limit === "number" && Number.isFinite(limit) ? filtered.slice(0, limit) : filtered;
   if (!entries.length) {
     listEl.innerHTML = "";
     emptyEl.style.display = "";
@@ -993,21 +1000,42 @@ function saveOrdersToStorage() {
 }
 
 function attachOrderSort() {
-  if (!ordersSortEl) return;
+  const inputs = document.querySelectorAll('input[name="orders-sort"]');
+  if (!inputs.length || !ordersSortTriggerEl || !ordersSortMenuEl) return;
   const saved = localStorage.getItem(`${ORDER_STORAGE_KEY}.sort`);
-  if (saved && ordersSortEl.querySelector(`option[value="${saved}"]`)) {
-    ordersSortEl.value = saved;
-    renderOrders();
+  if (saved) {
+    const target = Array.from(inputs).find((input) => input.value === saved);
+    if (target) {
+      target.checked = true;
+    }
   }
-  ordersSortEl.addEventListener("change", () => {
-    localStorage.setItem(`${ORDER_STORAGE_KEY}.sort`, ordersSortEl.value);
-    renderOrders();
+  ordersSortTriggerEl.addEventListener("click", () => {
+    const isOpen = ordersSortMenuEl.classList.toggle("open");
+    ordersSortTriggerEl.setAttribute("aria-expanded", String(isOpen));
+  });
+  document.addEventListener("click", (event) => {
+    if (
+      !ordersSortMenuEl.contains(event.target) &&
+      !ordersSortTriggerEl.contains(event.target)
+    ) {
+      ordersSortMenuEl.classList.remove("open");
+      ordersSortTriggerEl.setAttribute("aria-expanded", "false");
+    }
+  });
+  inputs.forEach((input) => {
+    input.addEventListener("change", () => {
+      localStorage.setItem(`${ORDER_STORAGE_KEY}.sort`, input.value);
+      ordersSortMenuEl.classList.remove("open");
+      ordersSortTriggerEl.setAttribute("aria-expanded", "false");
+      renderOrders();
+    });
   });
 }
 
 function getSortedOrders() {
   const list = [...orders];
-  const sortMode = ordersSortEl?.value || "date";
+  const selectedInput = document.querySelector('input[name="orders-sort"]:checked');
+  const sortMode = selectedInput?.value || "date";
   const compareDateDesc = (a, b) => new Date(b.createdAt) - new Date(a.createdAt);
   switch (sortMode) {
     case "date-asc":
@@ -1019,6 +1047,13 @@ function getSortedOrders() {
     default:
       return list.sort(compareDateDesc);
   }
+}
+
+function filterOrdersByView(list) {
+  if (ordersViewFilter === "past") {
+    return list.filter((order) => order.status === "cancel_pending" || order.status === "cancelled");
+  }
+  return list.filter((order) => order.status !== "cancelled" && order.status !== "cancel_pending");
 }
 
 function attachOrderActionHandlers() {
@@ -1039,6 +1074,16 @@ function attachOrderActionHandlers() {
         if (!orderId) return;
         openOrderQrModal(orderId);
     }
+  });
+  const viewButtons = document.querySelectorAll("[data-orders-view]");
+  viewButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const targetView = button.dataset.ordersView;
+      if (!targetView || targetView === ordersViewFilter) return;
+      ordersViewFilter = targetView;
+      viewButtons.forEach((btn) => btn.classList.toggle("active", btn === button));
+      renderOrders();
+    });
   });
 }
 

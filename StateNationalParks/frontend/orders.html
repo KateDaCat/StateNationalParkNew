@@ -29,31 +29,50 @@
     </header>
 
     <main class="orders-main">
-      <section class="orders-hero">
-        <p class="eyebrow">Order history</p>
-        <h1>My Orders</h1>
-        <div class="orders-filters">
-          <label class="orders-filter">
-            <span>Sort by</span>
-            <select id="orders-sort">
-              <option value="date">Date (newest)</option>
-              <option value="date-asc">Date (oldest)</option>
-              <option value="total">Total price (high → low)</option>
-              <option value="total-asc">Total price (low → high)</option>
-            </select>
-          </label>
-        </div>
-      </section>
+        <section class="orders-hero">
+          <p class="eyebrow">Order history</p>
+          <div class="orders-hero-header">
+            <h1>My Orders</h1>
+            <button type="button" class="orders-sort-btn" id="orders-sort-trigger" aria-haspopup="true" aria-expanded="false" title="Sort orders">
+              <span class="sr-only">Sort orders</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M6 5h12M9 10h7M11 15h3M12 5v14" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" />
+              </svg>
+            </button>
+            <div class="orders-sort-menu" id="orders-sort-menu" role="menu">
+              <label class="orders-sort-option">
+                <input type="radio" name="orders-sort" value="date" checked />
+                <span>Date · newest first</span>
+              </label>
+              <label class="orders-sort-option">
+                <input type="radio" name="orders-sort" value="date-asc" />
+                <span>Date · oldest first</span>
+              </label>
+              <label class="orders-sort-option">
+                <input type="radio" name="orders-sort" value="total" />
+                <span>Total · high to low</span>
+              </label>
+              <label class="orders-sort-option">
+                <input type="radio" name="orders-sort" value="total-asc" />
+                <span>Total · low to high</span>
+              </label>
+            </div>
+          </div>
+          <div class="orders-tabs">
+            <button type="button" class="orders-tab active" data-orders-view="upcoming">Upcoming orders</button>
+            <button type="button" class="orders-tab" data-orders-view="past">Past orders</button>
+          </div>
+        </section>
 
-      <section class="orders-archive">
-        <div class="orders-empty" id="orders-empty-full">
-          <p class="eyebrow">No orders yet</p>
-          <h3>Complete a checkout to populate this list</h3>
-          <p class="muted">Orders are saved on this device. Future tickets and merch will appear here.</p>
-          <a href="homepage.html#tickets" class="btn secondary">Start booking</a>
-        </div>
-        <div class="orders-grid orders-grid-full" id="orders-list-full" aria-live="polite" aria-busy="false"></div>
-      </section>
+        <section class="orders-archive">
+          <div class="orders-empty" id="orders-empty-full">
+            <p class="eyebrow">No orders yet</p>
+            <h3>Complete a checkout to populate this list</h3>
+            <p class="muted">Orders are saved on this device. Future tickets and merch will appear here.</p>
+            <a href="homepage.html#tickets" class="btn secondary">Start booking</a>
+          </div>
+          <div class="orders-grid orders-grid-full" id="orders-list-full" aria-live="polite" aria-busy="false"></div>
+        </section>
     </main>
 
     <button class="cart-fab" id="cart-button" aria-haspopup="true" aria-expanded="false">
