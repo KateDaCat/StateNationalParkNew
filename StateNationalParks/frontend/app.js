@@ -23,6 +23,11 @@ let cartSuccessTotalEl;
 let cartSuccessOrderEl;
 let ordersListEl;
 let ordersEmptyEl;
+let ordersListFullEl;
+let ordersEmptyFullEl;
+let ordersHintEl;
+let ordersHintTextEl;
+let ordersViewAllBtn;
 
 document.addEventListener("DOMContentLoaded", () => {
   cartDrawerEl = document.getElementById("cart-drawer");
@@ -584,18 +589,47 @@ function addTicketEntriesToCart({ park, date, time, adults, kids }) {
 function initOrders() {
   ordersListEl = document.getElementById("orders-list");
   ordersEmptyEl = document.getElementById("orders-empty");
+  ordersListFullEl = document.getElementById("orders-list-full");
+  ordersEmptyFullEl = document.getElementById("orders-empty-full");
+  ordersHintEl = document.getElementById("orders-hint");
+  ordersHintTextEl = document.getElementById("orders-hint-text");
+  ordersViewAllBtn = document.getElementById("orders-view-all");
   renderOrders();
 }
 
 function renderOrders() {
-  if (!ordersListEl || !ordersEmptyEl) return;
-  if (!orders.length) {
-    ordersListEl.innerHTML = "";
-    ordersEmptyEl.style.display = "";
+  renderOrdersInto({
+    listEl: ordersListEl,
+    emptyEl: ordersEmptyEl,
+    limit: 1,
+  });
+  renderOrdersInto({
+    listEl: ordersListFullEl,
+    emptyEl: ordersEmptyFullEl,
+  });
+  const hasOrders = orders.length > 0;
+  if (ordersHintEl) {
+    ordersHintEl.style.display = hasOrders ? "" : "none";
+    if (ordersHintTextEl) {
+      ordersHintTextEl.textContent = orders.length > 1 ? "Showing your most recent order." : "Your latest order will appear here.";
+    }
+  }
+  if (ordersViewAllBtn) {
+    ordersViewAllBtn.style.display = hasOrders ? "" : "none";
+  }
+}
+
+function renderOrdersInto({ listEl, emptyEl, limit }) {
+  if (!listEl || !emptyEl) return;
+  const entries =
+    typeof limit === "number" && Number.isFinite(limit) ? orders.slice(0, limit) : orders;
+  if (!entries.length) {
+    listEl.innerHTML = "";
+    emptyEl.style.display = "";
     return;
   }
-  ordersEmptyEl.style.display = "none";
-  ordersListEl.innerHTML = orders.map(renderOrderCard).join("");
+  emptyEl.style.display = "none";
+  listEl.innerHTML = entries.map(renderOrderCard).join("");
 }
 
 function renderOrderCard(order) {

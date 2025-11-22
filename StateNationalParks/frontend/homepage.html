@@ -144,7 +144,11 @@
               <p class="muted">Tickets and merch purchased together will be grouped under one order ID.</p>
               <button type="button" class="btn secondary" data-scroll-to="tickets">Browse tickets</button>
             </div>
-            <div class="orders-grid" id="orders-list" aria-live="polite" aria-busy="false"></div>
+            <div class="orders-grid orders-grid-compact" id="orders-list" aria-live="polite" aria-busy="false"></div>
+            <div class="orders-hint" id="orders-hint" style="display: none;">
+              <p class="muted" id="orders-hint-text">Showing your latest order.</p>
+              <a class="btn ghost small" id="orders-view-all" href="orders.html">View all orders</a>
+            </div>
           
         </section>
 
