@@ -3,7 +3,8 @@
 const activityEntries = [];
 const MAX_FEED_ITEMS = 6;
 const cartItems = [];
-const orders = [];
+const ORDER_STORAGE_KEY = "snparks.orders";
+let orders = loadOrdersFromStorage();
 const DEFAULT_CUSTOMER = {
   id: "CUS-48201",
   name: "Trail Explorer",
@@ -665,6 +666,7 @@ function addOrderFromCartItems() {
   const order = createOrderFromItems(snapshot);
   orders.unshift(order);
   renderOrders();
+  saveOrdersToStorage();
   return order;
 }
 
@@ -840,5 +842,34 @@ function getOrderStatusBadge(status) {
       return { label: "Refunded", variant: "danger" };
     default:
       return { label: "Completed", variant: "success" };
+  }
+}
+
+function loadOrdersFromStorage() {
+  try {
+    const raw = localStorage.getItem(ORDER_STORAGE_KEY);
+    if (!raw) return [];
+    const data = JSON.parse(raw);
+    if (!Array.isArray(data)) return [];
+    return data.map((entry) => ({
+      ...entry,
+      createdAt: entry.createdAt ? new Date(entry.createdAt) : new Date(),
+      items: (entry.items || []).map((item) => ({ ...item })),
+    }));
+  } catch (error) {
+    console.warn("Failed to load order history", error);
+    return [];
+  }
+}
+
+function saveOrdersToStorage() {
+  try {
+    const payload = orders.map((order) => ({
+      ...order,
+      createdAt: order.createdAt ? new Date(order.createdAt).toISOString() : undefined,
+    }));
+    localStorage.setItem(ORDER_STORAGE_KEY, JSON.stringify(payload));
+  } catch (error) {
+    console.warn("Failed to persist orders", error);
   }
 }
