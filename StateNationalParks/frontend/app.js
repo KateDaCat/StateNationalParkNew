@@ -651,8 +651,8 @@ function renderOrderCard(order) {
       <div class="order-footer">
         <span>Total ${formatCurrency(order.total)}</span>
         <div class="order-footer-actions">
-          <button type="button" class="btn ghost small">Download receipt</button>
-          <button type="button" class="btn ghost small">Request refund</button>
+          <button type="button" class="btn ghost small">Show QR code</button>
+          <button type="button" class="btn ghost small">Cancel order</button>
         </div>
       </div>
     </article>
