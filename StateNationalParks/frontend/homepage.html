@@ -19,9 +19,9 @@
         State National Parks
       </div>
         <nav class="nav-links">
-        <a href="homepage.html#access">Home</a>
-            <a href="homepage.html#tickets">Tickets</a>
-            <a href="homepage.html#my-tickets">My Tickets</a>
+          <a href="homepage.html#access">Home</a>
+              <a href="homepage.html#tickets">Tickets</a>
+              <a href="homepage.html#my-orders">My Orders</a>
           <a href="merchandise.html">Merchandise</a>
           <a href="signin.html" class="btn ghost small">Sign in</a>
           <a href="signup.html" class="btn primary small">Create account</a>
@@ -130,116 +130,82 @@
         
       </section>
 
-        <section id="my-tickets">
+          <section id="my-orders">
           <div class="section-heading">
-            <p class="eyebrow">My tickets</p>
-            <h2>Check the status of tickets you have requested</h2>
+              <p class="eyebrow">My orders</p>
+              <h2>Track every purchase in one place</h2>
             <p class="muted">
-              Once a request is submitted, it lands here with the latest confirmation or refund status from the system.
+                Each checkout groups tickets and merchandise into an order with its own ID, payment status, and timeline.
             </p>
           </div>
-          <div class="ticket-summary-grid">
-            <article class="ticket-summary-card">
-              <header>
-                <h3>Explorer Pass</h3>
-                <span class="ticket-status success">Confirmed</span>
-              </header>
-              <p class="muted">Skyline Canyon · 12 Jan 2026 · 09:00</p>
-              <dl>
-                <div>
-                  <dt>Party</dt>
-                  <dd>2 adults · 1 kid</dd>
-                </div>
-                <div>
-                  <dt>Order ID</dt>
-                  <dd>ORD-48211</dd>
-                </div>
-              </dl>
-              <button type="button" class="btn ghost small">View receipt</button>
-            </article>
-
-            <article class="ticket-summary-card">
-              <header>
-                <h3>Night Safari</h3>
-                <span class="ticket-status warning">Pending</span>
-              </header>
-              <p class="muted">Evergreen Reserve · 20 Jan 2026 · 19:30</p>
-              <dl>
-                <div>
-                  <dt>Party</dt>
-                  <dd>1 adult</dd>
-                </div>
-                <div>
-                  <dt>Order ID</dt>
-                  <dd>ORD-48289</dd>
-                </div>
-              </dl>
-              <button type="button" class="btn ghost small">Cancel / refund</button>
-            </article>
-
-            <article class="ticket-summary-card">
-              <header>
-                <h3>Family Adventure</h3>
-                <span class="ticket-status danger">Refunded</span>
-              </header>
-              <p class="muted">Meadow Basin · 05 Feb 2026 · 10:15</p>
-              <dl>
-                <div>
-                  <dt>Party</dt>
-                  <dd>2 adults · 2 kids</dd>
-                </div>
-                <div>
-                  <dt>Order ID</dt>
-                  <dd>ORD-48340</dd>
-                </div>
-              </dl>
-              <button type="button" class="btn ghost small">Download receipt</button>
-            </article>
-          </div>
+            <div class="orders-empty" id="orders-empty">
+              <p class="eyebrow">No orders yet</p>
+              <h3>Checkout to see your first order</h3>
+              <p class="muted">Tickets and merch purchased together will be grouped under one order ID.</p>
+              <button type="button" class="btn secondary" data-scroll-to="tickets">Browse tickets</button>
+            </div>
+            <div class="orders-grid orders-grid-compact" id="orders-list" aria-live="polite" aria-busy="false"></div>
+            <div class="orders-hint" id="orders-hint" style="display: none;">
+              <p class="muted" id="orders-hint-text">Showing your latest order.</p>
+              <a class="btn ghost small" id="orders-view-all" href="orders.html">View all orders</a>
+            </div>
           
         </section>
 
-        <section id="reviews">
-          <div class="section-heading">
+          <section id="reviews" class="review-section">
             <p class="eyebrow">Share a review</p>
-            <h2>Close the loop after your visit</h2>
+            <h2>Rate us</h2>
+            <p class="muted review-copy">Tell us how your visit went — help us improve the experience for every explorer.</p>
+            <button type="button" class="btn primary review-open-btn" id="review-open-btn">Write a review</button>
+          </section>
+
+          <div class="review-modal" id="review-modal" aria-hidden="true">
+            <div class="review-modal-backdrop" data-review-close></div>
+            <div class="review-modal-card" role="dialog" aria-modal="true" aria-labelledby="review-modal-title">
+              <button type="button" class="review-modal-close" aria-label="Close dialog" data-review-close>×</button>
+              <h3 id="review-modal-title">Write a review</h3>
+                <form id="review-form" novalidate>
+                  <input
+                    type="number"
+                    name="rating"
+                    id="review-rating"
+                    class="sr-only"
+                    value="0"
+                    min="1"
+                    max="5"
+                    required
+                    aria-hidden="true"
+                  />
+                <div class="review-stars" aria-label="Select rating">
+                  <button type="button" class="review-star" data-star="1" aria-label="1 star">★</button>
+                  <button type="button" class="review-star" data-star="2" aria-label="2 stars">★</button>
+                  <button type="button" class="review-star" data-star="3" aria-label="3 stars">★</button>
+                  <button type="button" class="review-star" data-star="4" aria-label="4 stars">★</button>
+                  <button type="button" class="review-star" data-star="5" aria-label="5 stars">★</button>
+                </div>
+                <label class="review-field">
+                  Attach photos
+                  <input type="file" name="photos" id="review-photos" accept="image/*" multiple />
+                  <small class="muted">Attach up to 3 images (jpg, png, gif).</small>
+                </label>
+                <label class="review-field">
+                  Your review
+                  <textarea
+                    name="comment"
+                    id="review-comment"
+                    rows="4"
+                    placeholder="Share highlights or areas to improve…"
+                    required
+                  ></textarea>
+                  <small class="muted"><span id="review-word-count">0</span>/100 words</small>
+                </label>
+                <div class="review-modal-actions">
+                  <button type="button" class="btn ghost" data-review-close>Cancel</button>
+                  <button type="submit" class="btn primary">Submit review</button>
+                </div>
+              </form>
+            </div>
           </div>
-        <div class="forms-grid">
-          <article class="form-card">
-            <h3>Submit Review</h3>
-            <form id="review-form">
-              <label>
-                Rating
-                <select name="rating" required>
-                  <option value="">Choose</option>
-                  <option value="5">5 — Excellent</option>
-                  <option value="4">4 — Great</option>
-                  <option value="3">3 — Okay</option>
-                  <option value="2">2 — Needs work</option>
-                  <option value="1">1 — Poor</option>
-                </select>
-              </label>
-              <label>
-                Comment
-                <textarea
-                  name="comment"
-                  rows="4"
-                  placeholder="Trail signage could use more directions…"
-                  required
-                ></textarea>
-              </label>
-              <button type="submit" class="btn secondary">Send feedback</button>
-            </form>
-          </article>
-          <article class="feed-card">
-            <header>
-              <h3>Activity feed</h3>
-              <p id="activity-message" class="muted">No requests yet.</p>
-            </header>
-            <ul id="activity-feed" class="activity-feed"></ul>
-          </article>
-        </div>
-      </section>
     </main>
 
         <button class="cart-fab" id="cart-button" aria-haspopup="true" aria-expanded="false">

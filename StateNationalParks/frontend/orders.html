@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Orders · State National Parks</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="orders-page">
+    <header class="site-header">
+      <div class="logo">
+        <span class="accent-dot"></span>
+        State National Parks
+      </div>
+      <nav class="nav-links">
+        <a href="homepage.html#access">Home</a>
+        <a href="homepage.html#tickets">Tickets</a>
+        <a href="orders.html" aria-current="page">My Orders</a>
+        <a href="merchandise.html">Merchandise</a>
+        <a href="signin.html" class="btn ghost small">Sign in</a>
+        <a href="signup.html" class="btn primary small">Create account</a>
+      </nav>
+    </header>
+
+    <main class="orders-main">
+        <section class="orders-hero">
+          <p class="eyebrow">Order history</p>
+          <div class="orders-hero-header">
+            <h1>My Orders</h1>
+            <button type="button" class="orders-sort-btn" id="orders-sort-trigger" aria-haspopup="true" aria-expanded="false" title="Sort orders">
+              <span class="sr-only">Sort orders</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M6 5h12M9 10h7M11 15h3M12 5v14" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" />
+              </svg>
+            </button>
+            <div class="orders-sort-menu" id="orders-sort-menu" role="menu">
+              <label class="orders-sort-option">
+                <input type="radio" name="orders-sort" value="date" checked />
+                <span>Date · newest first</span>
+              </label>
+              <label class="orders-sort-option">
+                <input type="radio" name="orders-sort" value="date-asc" />
+                <span>Date · oldest first</span>
+              </label>
+              <label class="orders-sort-option">
+                <input type="radio" name="orders-sort" value="total" />
+                <span>Total · high to low</span>
+              </label>
+              <label class="orders-sort-option">
+                <input type="radio" name="orders-sort" value="total-asc" />
+                <span>Total · low to high</span>
+              </label>
+            </div>
+          </div>
+          <div class="orders-tabs">
+            <button type="button" class="orders-tab active" data-orders-view="upcoming">Upcoming orders</button>
+            <button type="button" class="orders-tab" data-orders-view="past">Past orders</button>
+          </div>
+        </section>
+
+        <section class="orders-archive">
+          <div class="orders-empty" id="orders-empty-full">
+            <p class="eyebrow">Orders</p>
+            <h3 data-empty-title>Complete a checkout to populate this list</h3>
+            <p class="muted" data-empty-copy>Orders are saved on this device. Future tickets and merch will appear here.</p>
+            <a href="homepage.html#tickets" class="btn secondary">Start booking</a>
+          </div>
+          <div class="orders-grid orders-grid-full" id="orders-list-full" aria-live="polite" aria-busy="false"></div>
+        </section>
+    </main>
+
+    <button class="cart-fab" id="cart-button" aria-haspopup="true" aria-expanded="false">
+      <span class="sr-only">View cart</span>
+      <span class="cart-count" id="cart-count">0</span>
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path
+          d="M7 4h-2l-1 2m0 0-2 4h3l1.5-3H19l-2 6H9l-1 2h11"
+          stroke="currentColor"
+          stroke-width="1.5"
+          fill="none"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <circle cx="10" cy="21" r="1.4" />
+        <circle cx="17" cy="21" r="1.4" />
+      </svg>
+    </button>
+    <div class="cart-overlay" id="cart-overlay"></div>
+    <aside class="cart-drawer" id="cart-drawer" aria-live="polite">
+      <div class="cart-header">
+        <div>
+          <p class="eyebrow">Cart</p>
+          <h3>Items ready to checkout</h3>
+        </div>
+        <button type="button" class="cart-close" id="cart-close" aria-label="Close cart">×</button>
+      </div>
+      <div class="cart-summary" id="cart-summary">No items in cart</div>
+      <ul id="cart-items" class="cart-items"></ul>
+      <div class="cart-footer">
+        <div>
+          <p class="muted">Estimated total</p>
+          <strong id="cart-total">RM0.00</strong>
+        </div>
+        <button class="btn secondary" type="button">Checkout</button>
+      </div>
+    </aside>
+
+    <footer>
+      <div>
+        <p class="eyebrow">Need to test?</p>
+        <p>
+          Serve this folder (e.g. <code>python -m http.server</code>) and open <code>orders.html</code>.
+        </p>
+      </div>
+      <p class="muted">Frontend-only reference derived from finalUMLdrawio.png</p>
+    </footer>
+
+    <script src="app.js" defer></script>
+  </body>
+</html>
