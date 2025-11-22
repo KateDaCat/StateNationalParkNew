@@ -11,6 +11,8 @@ let cartOverlayEl;
 let cartCloseBtn;
 let cartSummaryEl;
 let ticketSummaryEls = {};
+let cartSuccessViewEl;
+let cartSuccessTotalEl;
 
 document.addEventListener("DOMContentLoaded", () => {
   cartDrawerEl = document.getElementById("cart-drawer");
@@ -22,6 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
   attachFormHandlers();
   renderCart();
   attachCartControls();
+  attachCheckoutHandler();
   attachMerchButtons();
   attachColorPickers();
   initTicketSummary();
@@ -258,6 +261,94 @@ function setCartOpen(isOpen) {
   if (cartOverlayEl) {
     cartOverlayEl.classList.toggle("open", isOpen);
   }
+  if (!isOpen) {
+    resetCartSuccessState();
+  }
+}
+
+function attachCheckoutHandler() {
+  if (!cartDrawerEl) return;
+  const checkoutButton = cartDrawerEl.querySelector(".cart-footer .btn");
+  if (!checkoutButton) return;
+  checkoutButton.addEventListener("click", () => {
+    if (!cartItems.length) {
+      if (cartSummaryEl) {
+        cartSummaryEl.textContent = "Add at least one item to checkout.";
+      }
+      openCartDrawer();
+      return;
+    }
+    showCartPaymentSuccess();
+  });
+}
+
+function showCartPaymentSuccess() {
+  if (!cartDrawerEl) return;
+  const successView = ensureCartSuccessView();
+  if (!successView) return;
+  const total = cartItems.reduce(
+    (sum, entry) => sum + (entry.unitPrice || 0) * (entry.quantity || 0),
+    0
+  );
+  if (cartSuccessTotalEl) {
+    cartSuccessTotalEl.textContent = total ? `${formatCurrency(total)} paid` : "";
+  }
+  cartDrawerEl.classList.add("success-mode");
+  cartItems.length = 0;
+  renderCart();
+  setCartOpen(true);
+  successView.focus();
+}
+
+function ensureCartSuccessView() {
+  if (cartSuccessViewEl) {
+    return cartSuccessViewEl;
+  }
+  if (!cartDrawerEl) return null;
+  const successEl = document.createElement("div");
+  successEl.className = "cart-success-state";
+  successEl.setAttribute("role", "status");
+  successEl.setAttribute("tabindex", "-1");
+  successEl.innerHTML = `
+    <div class="cart-success-icon" aria-hidden="true">✓</div>
+    <h3>Payment successful</h3>
+    <p class="muted">Your tickets are confirmed and saved to your account.</p>
+    <p class="cart-success-total" data-success-amount></p>
+    <div class="cart-success-actions">
+      <button type="button" class="btn primary" data-action="view-tickets">View my tickets</button>
+      <button type="button" class="btn ghost" data-action="close-cart">Close</button>
+    </div>
+  `;
+  cartSuccessTotalEl = successEl.querySelector("[data-success-amount]");
+  const viewTicketsBtn = successEl.querySelector("[data-action='view-tickets']");
+  const closeBtn = successEl.querySelector("[data-action='close-cart']");
+  viewTicketsBtn?.addEventListener("click", () => {
+    navigateToTickets();
+    setCartOpen(false);
+  });
+  closeBtn?.addEventListener("click", () => setCartOpen(false));
+  cartDrawerEl.append(successEl);
+  cartSuccessViewEl = successEl;
+  return cartSuccessViewEl;
+}
+
+function resetCartSuccessState() {
+  if (!cartDrawerEl || !cartDrawerEl.classList.contains("success-mode")) {
+    return;
+  }
+  cartDrawerEl.classList.remove("success-mode");
+  if (cartSuccessTotalEl) {
+    cartSuccessTotalEl.textContent = "";
+  }
+}
+
+function navigateToTickets() {
+  const ticketSection = document.getElementById("tickets") || document.getElementById("ticket-form");
+  if (ticketSection) {
+    ticketSection.scrollIntoView({ behavior: "smooth", block: "start" });
+    return;
+  }
+  window.location.href = "homepage.html#tickets";
 }
 
 function attachCartItemHandlers() {
