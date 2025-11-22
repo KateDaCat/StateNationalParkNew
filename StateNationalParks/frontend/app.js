@@ -656,14 +656,7 @@ function renderOrderCard(order) {
   const inventorySummary = metaParts.join(" · ") || "No line items";
   const orderDateLabel = formatOrderTimestamp(order.createdAt);
   const paymentBadge = `${order.paymentStatus || "Success"} · ${order.paymentId || ""}`.trim();
-  const cancellationNote = order.cancellation
-    ? `<div class="order-note cancelled">
-        <strong>Cancelled ${escapeHTML(formatOrderTimestamp(order.cancellation.cancelledAt))}</strong>
-        <small>${escapeHTML(formatCancelReason(order.cancellation.reason))}${
-        order.cancellation.notes ? ` — ${escapeHTML(order.cancellation.notes)}` : ""
-      }</small>
-      </div>`
-    : "";
+  const cancellationNote = renderCancellationNote(order);
   const itemsHtml = order.items
     .map((item) => {
       const qtyLabel = item.quantity > 1 ? `${item.label} ×${item.quantity}` : item.label;
@@ -714,10 +707,10 @@ function renderOrderCard(order) {
       <div class="order-footer">
         <span>Total ${formatCurrency(order.total)}</span>
         <div class="order-footer-actions">
-            <button type="button" class="btn ghost small" data-action="show-qr" data-order-id="${order.id}">Show QR code</button>
-            <button type="button" class="btn ghost small" data-action="cancel-order" data-order-id="${order.id}" ${
-              order.status === "cancelled" ? "disabled" : ""
-            }>${order.status === "cancelled" ? "Cancelled" : "Cancel order"}</button>
+          <button type="button" class="btn ghost small" data-action="show-qr" data-order-id="${order.id}">Show QR code</button>
+          <button type="button" class="btn ghost small" data-action="cancel-order" data-order-id="${order.id}" ${
+            isCancellationLocked(order) ? "disabled" : ""
+          }>${getCancelButtonLabel(order)}</button>
         </div>
       </div>
     </article>
@@ -913,6 +906,8 @@ function getOrderStatusBadge(status) {
       return { label: "Pending", variant: "warning" };
     case "refunded":
       return { label: "Refunded", variant: "danger" };
+    case "cancel_pending":
+      return { label: "Cancellation requested", variant: "warning" };
     case "cancelled":
       return { label: "Cancelled", variant: "danger" };
     default:
@@ -933,9 +928,12 @@ function loadOrdersFromStorage() {
       cancellation: entry.cancellation
         ? {
             ...entry.cancellation,
+            requestedAt: entry.cancellation.requestedAt
+              ? new Date(entry.cancellation.requestedAt)
+              : undefined,
             cancelledAt: entry.cancellation.cancelledAt
               ? new Date(entry.cancellation.cancelledAt)
-              : new Date(),
+              : undefined,
           }
         : undefined,
     }));
@@ -953,6 +951,9 @@ function saveOrdersToStorage() {
       cancellation: order.cancellation
         ? {
             ...order.cancellation,
+            requestedAt: order.cancellation.requestedAt
+              ? new Date(order.cancellation.requestedAt).toISOString()
+              : undefined,
             cancelledAt: order.cancellation.cancelledAt
               ? new Date(order.cancellation.cancelledAt).toISOString()
               : undefined,
@@ -1086,18 +1087,19 @@ function ensureCancelOrderModal() {
   return cancelModalEl;
 }
 
-function cancelOrder(orderId, reason, notes) {
+function requestOrderCancellation(orderId, reason, notes) {
   const target = orders.find((entry) => entry.id === orderId);
-  if (!target || target.status === "cancelled") return;
-  target.status = "cancelled";
-  const badge = getOrderStatusBadge("cancelled");
+  if (!target || isCancellationLocked(target)) return;
+  target.status = "cancel_pending";
+  const badge = getOrderStatusBadge("cancel_pending");
   target.statusVariant = badge.variant;
   target.statusLabel = badge.label;
-  target.paymentStatus = "Cancelled";
+  target.paymentStatus = "Pending refund";
   target.cancellation = {
+    status: "requested",
     reason,
     notes,
-    cancelledAt: new Date(),
+    requestedAt: new Date(),
   };
   renderOrders();
   saveOrdersToStorage();
@@ -1105,4 +1107,38 @@ function cancelOrder(orderId, reason, notes) {
 
 function formatCancelReason(value) {
   return CANCEL_REASONS.find((reason) => reason.value === value)?.label || "Cancelled";
+}
+
+function isCancellationLocked(order) {
+  return order.status === "cancelled" || order.status === "cancel_pending";
+}
+
+function getCancelButtonLabel(order) {
+  if (order.status === "cancelled") return "Cancelled";
+  if (order.status === "cancel_pending") return "Cancel pending";
+  return "Cancel order";
+}
+
+function renderCancellationNote(order) {
+  const info = order.cancellation;
+  if (!info) return "";
+  if (info.status === "requested" || order.status === "cancel_pending") {
+    const requestedAt = info.requestedAt ? formatOrderTimestamp(info.requestedAt) : "recently";
+    return `<div class="order-note">
+      <strong>Cancellation requested ${escapeHTML(requestedAt)}</strong>
+      <small>${escapeHTML(formatCancelReason(info.reason))}${
+        info.notes ? ` — ${escapeHTML(info.notes)}` : ""
+      } · Refund will be processed once approved.</small>
+    </div>`;
+  }
+  if (info.status === "resolved" || info.cancelledAt || order.status === "cancelled") {
+    const cancelledAt = info.cancelledAt ? formatOrderTimestamp(info.cancelledAt) : "recently";
+    return `<div class="order-note cancelled">
+      <strong>Cancelled ${escapeHTML(cancelledAt)}</strong>
+      <small>${escapeHTML(formatCancelReason(info.reason))}${
+        info.notes ? ` — ${escapeHTML(info.notes)}` : ""
+      }</small>
+    </div>`;
+  }
+  return "";
 }
