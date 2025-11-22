@@ -474,6 +474,112 @@ section {
   font-size: 0.75rem;
 }
 
+.orders-empty {
+  border: 1px dashed rgba(60, 90, 60, 0.4);
+  border-radius: 1.25rem;
+  text-align: center;
+  padding: 2rem;
+  margin-bottom: 2.5rem;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.orders-empty .btn {
+  margin-top: 1rem;
+}
+
+.orders-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+}
+
+.order-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 1.1rem;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  box-shadow: var(--shadow);
+}
+
+.order-card header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.order-card h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.order-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.order-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.order-meta span::before {
+  content: "•";
+  color: rgba(60, 90, 60, 0.6);
+}
+
+.order-meta span:first-child::before {
+  content: "";
+}
+
+.order-items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.order-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.order-item strong {
+  display: block;
+}
+
+.order-item small {
+  color: var(--muted);
+}
+
+.order-item-amount {
+  font-weight: 600;
+  color: var(--accent-strong);
+}
+
+.order-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  font-weight: 600;
+}
+
+.order-footer .btn {
+  flex-shrink: 0;
+}
+
 .merch-hero {
   padding: 6rem 4vw 4rem;
   text-align: center;
@@ -1316,6 +1422,14 @@ footer {
 
 .cart-drawer.success-mode .cart-success-state {
   display: flex;
+}
+
+.cart-success-order {
+  margin: 0;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  color: var(--muted);
 }
 
 .cart-success-icon {

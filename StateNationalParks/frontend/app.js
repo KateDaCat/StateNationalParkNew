@@ -3,6 +3,7 @@
 const activityEntries = [];
 const MAX_FEED_ITEMS = 6;
 const cartItems = [];
+const orders = [];
 const ADULT_TICKET_PRICE = 45;
 const CHILD_TICKET_PRICE = 25;
 let cartDrawerEl;
@@ -13,6 +14,9 @@ let cartSummaryEl;
 let ticketSummaryEls = {};
 let cartSuccessViewEl;
 let cartSuccessTotalEl;
+let cartSuccessOrderEl;
+let ordersListEl;
+let ordersEmptyEl;
 
 document.addEventListener("DOMContentLoaded", () => {
   cartDrawerEl = document.getElementById("cart-drawer");
@@ -28,6 +32,8 @@ document.addEventListener("DOMContentLoaded", () => {
   attachMerchButtons();
   attachColorPickers();
   initTicketSummary();
+  initOrders();
+  attachScrollButtons();
 });
 
 function attachFormHandlers() {
@@ -283,13 +289,14 @@ function attachCheckoutHandler() {
 }
 
 function showCartPaymentSuccess() {
-  if (!cartDrawerEl) return;
+  if (!cartDrawerEl || !cartItems.length) return;
+  const order = addOrderFromCartItems();
   const successView = ensureCartSuccessView();
   if (!successView) return;
-  const total = cartItems.reduce(
-    (sum, entry) => sum + (entry.unitPrice || 0) * (entry.quantity || 0),
-    0
-  );
+  const total = order?.total ?? 0;
+  if (cartSuccessOrderEl) {
+    cartSuccessOrderEl.textContent = order?.id || "";
+  }
   if (cartSuccessTotalEl) {
     cartSuccessTotalEl.textContent = total ? `${formatCurrency(total)} paid` : "";
   }
@@ -311,19 +318,21 @@ function ensureCartSuccessView() {
   successEl.setAttribute("tabindex", "-1");
   successEl.innerHTML = `
     <div class="cart-success-icon" aria-hidden="true">✓</div>
+    <p class="cart-success-order" data-success-order></p>
     <h3>Payment successful</h3>
-    <p class="muted">Your tickets are confirmed and saved to your account.</p>
+    <p class="muted">Your order is confirmed and already listed in My Orders.</p>
     <p class="cart-success-total" data-success-amount></p>
     <div class="cart-success-actions">
-      <button type="button" class="btn primary" data-action="view-tickets">View my tickets</button>
+      <button type="button" class="btn primary" data-action="view-orders">View my orders</button>
       <button type="button" class="btn ghost" data-action="close-cart">Close</button>
     </div>
   `;
+  cartSuccessOrderEl = successEl.querySelector("[data-success-order]");
   cartSuccessTotalEl = successEl.querySelector("[data-success-amount]");
-  const viewTicketsBtn = successEl.querySelector("[data-action='view-tickets']");
+  const viewOrdersBtn = successEl.querySelector("[data-action='view-orders']");
   const closeBtn = successEl.querySelector("[data-action='close-cart']");
-  viewTicketsBtn?.addEventListener("click", () => {
-    navigateToTickets();
+  viewOrdersBtn?.addEventListener("click", () => {
+    scrollToSection("my-orders");
     setCartOpen(false);
   });
   closeBtn?.addEventListener("click", () => setCartOpen(false));
@@ -337,18 +346,12 @@ function resetCartSuccessState() {
     return;
   }
   cartDrawerEl.classList.remove("success-mode");
+  if (cartSuccessOrderEl) {
+    cartSuccessOrderEl.textContent = "";
+  }
   if (cartSuccessTotalEl) {
     cartSuccessTotalEl.textContent = "";
   }
-}
-
-function navigateToTickets() {
-  const ticketSection = document.getElementById("tickets") || document.getElementById("ticket-form");
-  if (ticketSection) {
-    ticketSection.scrollIntoView({ behavior: "smooth", block: "start" });
-    return;
-  }
-  window.location.href = "homepage.html#tickets";
 }
 
 function attachCartItemHandlers() {
@@ -570,4 +573,209 @@ function addTicketEntriesToCart({ park, date, time, adults, kids }) {
       unitPrice: CHILD_TICKET_PRICE,
     });
   }
+}
+
+function initOrders() {
+  ordersListEl = document.getElementById("orders-list");
+  ordersEmptyEl = document.getElementById("orders-empty");
+  renderOrders();
+}
+
+function renderOrders() {
+  if (!ordersListEl || !ordersEmptyEl) return;
+  if (!orders.length) {
+    ordersListEl.innerHTML = "";
+    ordersEmptyEl.style.display = "";
+    return;
+  }
+  ordersEmptyEl.style.display = "none";
+  ordersListEl.innerHTML = orders.map(renderOrderCard).join("");
+}
+
+function renderOrderCard(order) {
+  const metaParts = getOrderMetaParts(order);
+  const metaHtml = metaParts.map((part) => `<span>${escapeHTML(part)}</span>`).join("");
+  const itemsHtml = order.items
+    .map((item) => {
+      const qtyLabel = item.quantity > 1 ? `${item.label} ×${item.quantity}` : item.label;
+      return `
+        <li class="order-item">
+          <div>
+            <strong>${escapeHTML(qtyLabel)}</strong>
+            <small>${escapeHTML(item.meta || "")}</small>
+          </div>
+          <div class="order-item-amount">${formatCurrency(item.unitPrice * (item.quantity || 1))}</div>
+        </li>`;
+    })
+    .join("");
+  return `
+    <article class="order-card">
+      <header>
+        <div>
+          <p class="eyebrow">Order</p>
+          <h3>${escapeHTML(order.id)}</h3>
+          <p class="muted">${escapeHTML(order.summary)}</p>
+        </div>
+        <span class="ticket-status ${order.statusVariant || "success"}">${escapeHTML(order.statusLabel || "Paid")}</span>
+      </header>
+      <div class="order-meta">${metaHtml}</div>
+      <ul class="order-items">${itemsHtml}</ul>
+      <div class="order-footer">
+        <span>Total ${formatCurrency(order.total)}</span>
+        <button type="button" class="btn ghost small">View receipt</button>
+      </div>
+    </article>
+  `;
+}
+
+function addOrderFromCartItems() {
+  if (!cartItems.length) return null;
+  const snapshot = cartItems.map((item) => ({ ...item }));
+  const order = createOrderFromItems(snapshot);
+  orders.unshift(order);
+  renderOrders();
+  return order;
+}
+
+function createOrderFromItems(items, overrides = {}) {
+  const normalizedItems = combineOrderItems(items);
+  const orderItems = normalizedItems.map((item) => ({
+    label: item.label || "Item",
+    category: item.category || "Item",
+    quantity: item.quantity || 1,
+    unitPrice: item.unitPrice || 0,
+    meta: describeCartItem(item),
+    park: item.park,
+    date: item.date,
+    time: item.time,
+  }));
+  const total = orderItems.reduce((sum, entry) => sum + entry.unitPrice * entry.quantity, 0);
+  const ticketCount = orderItems
+    .filter((entry) => entry.category === "Ticket")
+    .reduce((sum, entry) => sum + entry.quantity, 0);
+  const merchCount = orderItems
+    .filter((entry) => entry.category === "Merch")
+    .reduce((sum, entry) => sum + entry.quantity, 0);
+  return {
+    id: overrides.id || generateOrderId(),
+    createdAt: overrides.createdAt ? new Date(overrides.createdAt) : new Date(),
+    statusVariant: overrides.statusVariant || "success",
+    statusLabel: overrides.statusLabel || "Paid",
+    summary: overrides.summary || buildOrderSummary(orderItems),
+    items: orderItems,
+    total,
+    ticketCount,
+    merchCount,
+  };
+}
+
+function combineOrderItems(items) {
+  const grouped = new Map();
+  items.forEach((entry) => {
+    const key = [
+      entry.label,
+      entry.category,
+      entry.park,
+      entry.date,
+      entry.time,
+      entry.color,
+      entry.ticketType,
+    ]
+      .map((value) => value ?? "")
+      .join("|");
+    const quantity = entry.quantity || 1;
+    if (!grouped.has(key)) {
+      grouped.set(key, { ...entry, quantity });
+    } else {
+      grouped.get(key).quantity += quantity;
+    }
+  });
+  return Array.from(grouped.values());
+}
+
+function buildOrderSummary(orderItems) {
+  const firstTicket = orderItems.find((item) => item.category === "Ticket");
+  if (firstTicket) {
+    const parts = [];
+    if (firstTicket.park) parts.push(firstTicket.park);
+    if (firstTicket.date) parts.push(formatDate(firstTicket.date));
+    if (firstTicket.time) parts.push(firstTicket.time);
+    const summary = parts.filter(Boolean).join(" · ");
+    if (summary) {
+      return summary;
+    }
+  }
+  if (orderItems.length === 1) {
+    return orderItems[0].label;
+  }
+  return `${orderItems.length} items`;
+}
+
+function getOrderMetaParts(order) {
+  const parts = [];
+  if (order.createdAt) {
+    parts.push(`Placed ${formatOrderTimestamp(order.createdAt)}`);
+  }
+  if (order.ticketCount) {
+    parts.push(`${order.ticketCount} ticket${order.ticketCount === 1 ? "" : "s"}`);
+  }
+  if (order.merchCount) {
+    parts.push(`${order.merchCount} merch item${order.merchCount === 1 ? "" : "s"}`);
+  }
+  parts.push(`${order.items.length} line item${order.items.length === 1 ? "" : "s"}`);
+  return parts;
+}
+
+function generateOrderId() {
+  const random = Math.floor(100000 + Math.random() * 900000);
+  return `ORD-${random}`;
+}
+
+function formatOrderTimestamp(value) {
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return String(value);
+  }
+  const dateLabel = date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+  const timeLabel = date.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+  return `${dateLabel} · ${timeLabel}`;
+}
+
+function attachScrollButtons() {
+  const scrollButtons = document.querySelectorAll("[data-scroll-to]");
+  scrollButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const targetId = button.dataset.scrollTo;
+      scrollToSection(targetId);
+    });
+  });
+}
+
+function scrollToSection(sectionId) {
+  if (!sectionId) return;
+  const target = document.getElementById(sectionId);
+  if (target) {
+    target.scrollIntoView({ behavior: "smooth", block: "start" });
+    return;
+  }
+  const path = window.location.pathname.endsWith("homepage.html")
+    ? `#${sectionId}`
+    : `homepage.html#${sectionId}`;
+  window.location.href = path;
+}
+
+function escapeHTML(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }
