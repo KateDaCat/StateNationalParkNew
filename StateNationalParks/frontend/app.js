@@ -43,6 +43,10 @@ let cancelModalReasonEl;
 let cancelModalNotesEl;
 let cancelModalCloseBtns;
 let cancelModalActiveOrderId = null;
+let qrModalEl;
+let qrModalCloseBtns;
+let qrModalImageEl;
+let qrModalInfoEl;
 let orderActionsBound = false;
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -752,8 +756,9 @@ function createOrderFromItems(items, overrides = {}) {
   const paymentStatus =
     overrides.paymentStatus ||
     (status === "refunded" ? "Refunded" : status === "pending" ? "Authorized" : "Success");
+  const orderId = overrides.id || generateOrderId();
   return {
-    id: overrides.id || generateOrderId(),
+    id: orderId,
     createdAt: overrides.createdAt ? new Date(overrides.createdAt) : new Date(),
     status,
     statusVariant: overrides.statusVariant || statusBadge.variant,
@@ -769,6 +774,7 @@ function createOrderFromItems(items, overrides = {}) {
     customerId: overrides.customerId || DEFAULT_CUSTOMER.id,
     customerName: overrides.customerName || DEFAULT_CUSTOMER.name,
     customerType: overrides.customerType || DEFAULT_CUSTOMER.type,
+    qrPayload: overrides.qrPayload || generateQrPayload(orderId),
   };
 }
 
@@ -930,10 +936,11 @@ function loadOrdersFromStorage() {
       return [];
     }
     const data = parsed.orders;
-    return data.map((entry) => ({
+      return data.map((entry) => ({
       ...entry,
       createdAt: entry.createdAt ? new Date(entry.createdAt) : new Date(),
       items: (entry.items || []).map((item) => ({ ...item })),
+        qrPayload: entry.qrPayload || generateQrPayload(entry.id || generateOrderId()),
       cancellation: entry.cancellation
         ? {
             ...entry.cancellation,
@@ -1013,7 +1020,7 @@ function getSortedOrders() {
 function attachOrderActionHandlers() {
   if (orderActionsBound) return;
   orderActionsBound = true;
-  document.addEventListener("click", (event) => {
+    document.addEventListener("click", (event) => {
     const actionButton = event.target.closest("[data-action]");
     if (!actionButton) return;
     const { action, orderId } = actionButton.dataset;
@@ -1023,6 +1030,10 @@ function attachOrderActionHandlers() {
       const targetOrder = orders.find((entry) => entry.id === orderId);
         if (!targetOrder || isCancellationLocked(targetOrder)) return;
       openCancelOrderModal(orderId);
+      } else if (action === "show-qr") {
+        event.preventDefault();
+        if (!orderId) return;
+        openOrderQrModal(orderId);
     }
   });
 }
@@ -1156,4 +1167,74 @@ function renderCancellationNote(order) {
     </div>`;
   }
   return "";
+}
+
+function openOrderQrModal(orderId) {
+  const order = orders.find((entry) => entry.id === orderId);
+  if (!order) return;
+  ensureQrPayload(order);
+  const modal = ensureQrModal();
+  const qrUrl = getOrderQrUrl(order);
+  if (qrModalImageEl) {
+    qrModalImageEl.src = qrUrl;
+    qrModalImageEl.alt = `QR code for ${order.id}`;
+  }
+  if (qrModalInfoEl) {
+    qrModalInfoEl.textContent = `${order.id} · ${order.summary}`;
+  }
+  modal.classList.add("open");
+}
+
+function ensureQrModal() {
+  if (qrModalEl) return qrModalEl;
+  const modal = document.createElement("div");
+  modal.className = "order-modal";
+  modal.innerHTML = `
+    <div class="order-modal-backdrop" data-qr-modal-close></div>
+    <div class="order-modal-card order-qr-card" role="dialog" aria-modal="true" aria-labelledby="order-qr-title">
+      <header>
+        <h3 id="order-qr-title">Order QR code</h3>
+        <button type="button" class="order-modal-close" aria-label="Close dialog" data-qr-modal-close>×</button>
+      </header>
+      <div class="order-qr-body">
+        <img id="order-qr-image" alt="Order QR code" />
+        <p id="order-qr-info" class="muted"></p>
+        <small class="muted">Present this code at the park entrance or merchandise counter.</small>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  qrModalEl = modal;
+  qrModalImageEl = modal.querySelector("#order-qr-image");
+  qrModalInfoEl = modal.querySelector("#order-qr-info");
+  qrModalCloseBtns = modal.querySelectorAll("[data-qr-modal-close]");
+  qrModalCloseBtns.forEach((btn) => btn.addEventListener("click", closeQrModal));
+  modal.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      closeQrModal();
+    }
+  });
+  return qrModalEl;
+}
+
+function closeQrModal() {
+  if (!qrModalEl) return;
+  qrModalEl.classList.remove("open");
+}
+
+function ensureQrPayload(order) {
+  if (order.qrPayload) return order.qrPayload;
+  order.qrPayload = generateQrPayload(order.id);
+  saveOrdersToStorage();
+  return order.qrPayload;
+}
+
+function getOrderQrUrl(order) {
+  const payload = encodeURIComponent(ensureQrPayload(order));
+  return `https://api.qrserver.com/v1/create-qr-code/?size=280x280&data=${payload}`;
+}
+
+function generateQrPayload(orderId) {
+  const randomToken = Math.random().toString(36).slice(2, 10);
+  return `snparks://order/${orderId}?token=${randomToken}`;
 }
