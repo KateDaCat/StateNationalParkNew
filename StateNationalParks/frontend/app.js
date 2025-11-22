@@ -37,7 +37,6 @@ let ordersEmptyFullEl;
 let ordersHintEl;
 let ordersHintTextEl;
 let ordersViewAllBtn;
-let ordersSortEl;
 let ordersSortTriggerEl;
 let ordersSortMenuEl;
 let ordersViewFilter = "upcoming";
@@ -628,7 +627,6 @@ function initOrders() {
   ordersHintEl = document.getElementById("orders-hint");
   ordersHintTextEl = document.getElementById("orders-hint-text");
   ordersViewAllBtn = document.getElementById("orders-view-all");
-  ordersSortEl = document.getElementById("orders-sort");
   ordersSortTriggerEl = document.getElementById("orders-sort-trigger");
   ordersSortMenuEl = document.getElementById("orders-sort-menu");
   const storedView = localStorage.getItem(`${ORDER_STORAGE_KEY}.view`);
@@ -644,10 +642,12 @@ function renderOrders() {
     listEl: ordersListEl,
     emptyEl: ordersEmptyEl,
     limit: 1,
+    view: "upcoming",
   });
   renderOrdersInto({
     listEl: ordersListFullEl,
     emptyEl: ordersEmptyFullEl,
+    view: ordersViewFilter,
   });
   const hasOrders = orders.length > 0;
   if (ordersHintEl) {
@@ -659,12 +659,13 @@ function renderOrders() {
   if (ordersViewAllBtn) {
     ordersViewAllBtn.style.display = hasOrders ? "" : "none";
   }
+  updateOrdersEmptyFullMessage();
 }
 
-function renderOrdersInto({ listEl, emptyEl, limit }) {
+function renderOrdersInto({ listEl, emptyEl, limit, view = "upcoming" }) {
   if (!listEl || !emptyEl) return;
   const sorted = getSortedOrders();
-  const filtered = filterOrdersByView(sorted);
+  const filtered = filterOrdersByView(sorted, view);
   const entries =
     typeof limit === "number" && Number.isFinite(limit) ? filtered.slice(0, limit) : filtered;
   if (!entries.length) {
@@ -674,6 +675,20 @@ function renderOrdersInto({ listEl, emptyEl, limit }) {
   }
   emptyEl.style.display = "none";
   listEl.innerHTML = entries.map(renderOrderCard).join("");
+}
+
+function updateOrdersEmptyFullMessage() {
+  if (!ordersEmptyFullEl) return;
+  const titleEl = ordersEmptyFullEl.querySelector("[data-empty-title]");
+  const copyEl = ordersEmptyFullEl.querySelector("[data-empty-copy]");
+  if (!titleEl || !copyEl) return;
+  if (ordersViewFilter === "past") {
+    titleEl.textContent = "No past orders yet";
+    copyEl.textContent = "Completed or cancelled orders will appear here after their visit date.";
+  } else {
+    titleEl.textContent = "No upcoming orders";
+    copyEl.textContent = "New checkouts and future tickets will appear here.";
+  }
 }
 
 function renderOrderCard(order) {
@@ -1062,11 +1077,11 @@ function getSortedOrders() {
   }
 }
 
-function filterOrdersByView(list) {
-  if (ordersViewFilter === "past") {
-    return list.filter((order) => order.status === "cancel_pending" || order.status === "cancelled");
+function filterOrdersByView(list, view = "upcoming") {
+  if (view === "past") {
+    return list.filter((order) => isOrderPast(order));
   }
-  return list.filter((order) => order.status !== "cancelled" && order.status !== "cancel_pending");
+  return list.filter((order) => !isOrderPast(order));
 }
 
 function attachOrderActionHandlers() {
@@ -1311,4 +1326,35 @@ function getOrderQrUrl(order) {
 function generateQrPayload(orderId) {
   const randomToken = Math.random().toString(36).slice(2, 10);
   return `snparks://order/${orderId}?token=${randomToken}`;
+}
+
+function isOrderPast(order) {
+  if (order.status === "cancel_pending" || order.status === "cancelled") {
+    return true;
+  }
+  const tickets = (order.items || []).filter((item) => item.category === "Ticket");
+  if (!tickets.length) {
+    return false;
+  }
+  return tickets.every(isTicketInPast);
+}
+
+function isTicketInPast(ticket) {
+  if (!ticket || !ticket.date) return false;
+  const target = normalizeDate(ticket.date);
+  if (!target) return false;
+  const threshold = new Date();
+  threshold.setHours(0, 0, 0, 0);
+  threshold.setDate(threshold.getDate() - CANCELLATION_WINDOW_DAYS);
+  return target < threshold;
+}
+
+function normalizeDate(value) {
+  if (!value) return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+  date.setHours(0, 0, 0, 0);
+  return date;
 }
