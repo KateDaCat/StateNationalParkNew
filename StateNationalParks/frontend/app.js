@@ -51,6 +51,14 @@ let qrModalCloseBtns;
 let qrModalImageEl;
 let qrModalInfoEl;
 let orderActionsBound = false;
+let reviewModalEl;
+let reviewOpenBtn;
+let reviewCloseBtns;
+let reviewStarsEls;
+let reviewRatingInput;
+let reviewWordCountEl;
+let reviewCommentEl;
+let reviewPhotosInput;
 
 document.addEventListener("DOMContentLoaded", () => {
   cartDrawerEl = document.getElementById("cart-drawer");
@@ -70,6 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
   attachScrollButtons();
   attachOrderSort();
   attachOrderActionHandlers();
+  initReviewModal();
 });
 
 function attachFormHandlers() {
@@ -1330,6 +1339,117 @@ function getOrderQrUrl(order) {
 function generateQrPayload(orderId) {
   const randomToken = Math.random().toString(36).slice(2, 10);
   return `snparks://order/${orderId}?token=${randomToken}`;
+}
+
+function initReviewModal() {
+  reviewModalEl = document.getElementById("review-modal");
+  reviewOpenBtn = document.getElementById("review-open-btn");
+  const form = document.getElementById("review-form");
+  if (!reviewModalEl || !reviewOpenBtn || !form) return;
+  reviewCloseBtns = reviewModalEl.querySelectorAll("[data-review-close]");
+  reviewStarsEls = Array.from(reviewModalEl.querySelectorAll(".review-star"));
+  reviewRatingInput = document.getElementById("review-rating");
+  reviewWordCountEl = document.getElementById("review-word-count");
+  reviewCommentEl = document.getElementById("review-comment");
+  reviewPhotosInput = document.getElementById("review-photos");
+  reviewOpenBtn.addEventListener("click", () => openReviewModal());
+  reviewCloseBtns.forEach((btn) => btn.addEventListener("click", closeReviewModal));
+  reviewModalEl.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      closeReviewModal();
+    }
+  });
+  reviewStarsEls.forEach((star) => {
+    star.addEventListener("click", () => {
+      const value = Number(star.dataset.star);
+      setReviewRating(value);
+    });
+  });
+  if (reviewCommentEl) {
+    reviewCommentEl.addEventListener("input", handleReviewWordLimit);
+  }
+  if (reviewPhotosInput) {
+    reviewPhotosInput.addEventListener("change", enforceReviewPhotoLimit);
+  }
+  form.addEventListener("submit", (event) => {
+    if (!validateReviewForm()) {
+      event.preventDefault();
+      return;
+    }
+    closeReviewModal();
+  });
+  updateReviewWordCount(0);
+}
+
+function openReviewModal() {
+  if (!reviewModalEl) return;
+  if (reviewRatingInput) {
+    reviewRatingInput.value = "0";
+    setReviewRating(0);
+  }
+  if (reviewCommentEl) {
+    reviewCommentEl.value = "";
+    handleReviewWordLimit();
+  }
+  if (reviewPhotosInput) {
+    reviewPhotosInput.value = "";
+  }
+  reviewModalEl.classList.add("open");
+  reviewModalEl.setAttribute("aria-hidden", "false");
+}
+
+function closeReviewModal() {
+  if (!reviewModalEl) return;
+  reviewModalEl.classList.remove("open");
+  reviewModalEl.setAttribute("aria-hidden", "true");
+}
+
+function setReviewRating(value) {
+  if (!reviewRatingInput || !reviewStarsEls?.length) return;
+  reviewStarsEls.forEach((star) => {
+    const starValue = Number(star.dataset.star);
+    star.classList.toggle("active", starValue <= value);
+  });
+  reviewRatingInput.value = value;
+}
+
+function handleReviewWordLimit() {
+  if (!reviewCommentEl) return;
+  const maxWords = 100;
+  const words = reviewCommentEl.value.trim().split(/\s+/).filter(Boolean);
+  if (words.length > maxWords) {
+    reviewCommentEl.value = words.slice(0, maxWords).join(" ");
+  }
+  updateReviewWordCount(Math.min(words.length, maxWords));
+}
+
+function updateReviewWordCount(value) {
+  if (reviewWordCountEl) {
+    reviewWordCountEl.textContent = String(value);
+  }
+}
+
+function enforceReviewPhotoLimit(event) {
+  const input = event.target;
+  if (!input?.files) return;
+  if (input.files.length > 3) {
+    window.alert("You can attach up to 3 images.");
+    input.value = "";
+  }
+}
+
+function validateReviewForm() {
+  const rating = Number(reviewRatingInput?.value || 0);
+  if (!rating || rating < 1) {
+    window.alert("Please select a star rating.");
+    return false;
+  }
+  const words = reviewCommentEl?.value.trim().split(/\s+/).filter(Boolean) ?? [];
+  if (!words.length) {
+    window.alert("Please write a short review (up to 100 words).");
+    return false;
+  }
+  return true;
 }
 
 function isOrderPast(order) {

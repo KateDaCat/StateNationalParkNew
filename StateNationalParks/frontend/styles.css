@@ -1364,6 +1364,125 @@ textarea:focus {
   font-size: 0.9rem;
 }
 
+.review-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1rem;
+}
+
+.review-copy {
+  max-width: 420px;
+}
+
+.review-open-btn {
+  min-width: 220px;
+}
+
+.review-feed {
+  width: 100%;
+  max-width: 640px;
+}
+
+.review-modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 70;
+}
+
+.review-modal.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.review-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+}
+
+.review-modal-card {
+  position: relative;
+  z-index: 1;
+  background: #fff;
+  border-radius: 1.25rem;
+  padding: 2rem;
+  width: min(90vw, 520px);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  box-shadow: var(--shadow);
+}
+
+.review-modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  border: none;
+  background: transparent;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--muted);
+}
+
+.review-stars {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.review-star {
+  font-size: 2rem;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: #d1d5db;
+  transition: color 0.15s ease;
+}
+
+.review-star.active,
+.review-star:hover,
+.review-star:focus {
+  color: #facc15;
+}
+
+.review-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  width: 100%;
+  text-align: left;
+}
+
+.review-field input[type="file"] {
+  border: 1px dashed var(--border);
+  border-radius: 0.85rem;
+  padding: 0.75rem;
+}
+
+.review-field textarea {
+  border-radius: 0.85rem;
+  padding: 0.75rem;
+  min-height: 130px;
+}
+
+.review-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.review-modal-actions .btn {
+  min-width: 140px;
+}
+
 footer {
   border-top: 1px solid rgba(88, 70, 43, 0.15);
   padding: 2rem 4vw 3rem;
