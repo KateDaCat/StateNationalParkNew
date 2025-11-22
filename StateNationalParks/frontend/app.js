@@ -4,6 +4,13 @@ const activityEntries = [];
 const MAX_FEED_ITEMS = 6;
 const cartItems = [];
 const ORDER_STORAGE_KEY = "snparks.orders";
+const CANCEL_REASONS = [
+  { value: "wrong_destination", label: "I chose the wrong destination" },
+  { value: "wrong_time", label: "I chose the wrong date or time" },
+  { value: "change_plans", label: "My plans have changed" },
+  { value: "payment_issue", label: "Payment or billing issue" },
+  { value: "other", label: "Other reason" },
+];
 let orders = loadOrdersFromStorage();
 const DEFAULT_CUSTOMER = {
   id: "CUS-48201",
@@ -29,6 +36,13 @@ let ordersHintEl;
 let ordersHintTextEl;
 let ordersViewAllBtn;
 let ordersSortEl;
+let cancelModalEl;
+let cancelModalFormEl;
+let cancelModalReasonEl;
+let cancelModalNotesEl;
+let cancelModalCloseBtns;
+let cancelModalActiveOrderId = null;
+let orderActionsBound = false;
 
 document.addEventListener("DOMContentLoaded", () => {
   cartDrawerEl = document.getElementById("cart-drawer");
@@ -47,6 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initOrders();
   attachScrollButtons();
   attachOrderSort();
+  attachOrderActionHandlers();
 });
 
 function attachFormHandlers() {
@@ -641,6 +656,14 @@ function renderOrderCard(order) {
   const inventorySummary = metaParts.join(" · ") || "No line items";
   const orderDateLabel = formatOrderTimestamp(order.createdAt);
   const paymentBadge = `${order.paymentStatus || "Success"} · ${order.paymentId || ""}`.trim();
+  const cancellationNote = order.cancellation
+    ? `<div class="order-note cancelled">
+        <strong>Cancelled ${escapeHTML(formatOrderTimestamp(order.cancellation.cancelledAt))}</strong>
+        <small>${escapeHTML(formatCancelReason(order.cancellation.reason))}${
+        order.cancellation.notes ? ` — ${escapeHTML(order.cancellation.notes)}` : ""
+      }</small>
+      </div>`
+    : "";
   const itemsHtml = order.items
     .map((item) => {
       const qtyLabel = item.quantity > 1 ? `${item.label} ×${item.quantity}` : item.label;
@@ -686,12 +709,15 @@ function renderOrderCard(order) {
           <small>${escapeHTML(inventorySummary)}</small>
         </div>
       </div>
+      ${cancellationNote}
       <ul class="order-items">${itemsHtml}</ul>
       <div class="order-footer">
         <span>Total ${formatCurrency(order.total)}</span>
         <div class="order-footer-actions">
-          <button type="button" class="btn ghost small">Show QR code</button>
-          <button type="button" class="btn ghost small">Cancel order</button>
+            <button type="button" class="btn ghost small" data-action="show-qr" data-order-id="${order.id}">Show QR code</button>
+            <button type="button" class="btn ghost small" data-action="cancel-order" data-order-id="${order.id}" ${
+              order.status === "cancelled" ? "disabled" : ""
+            }>${order.status === "cancelled" ? "Cancelled" : "Cancel order"}</button>
         </div>
       </div>
     </article>
@@ -887,6 +913,8 @@ function getOrderStatusBadge(status) {
       return { label: "Pending", variant: "warning" };
     case "refunded":
       return { label: "Refunded", variant: "danger" };
+    case "cancelled":
+      return { label: "Cancelled", variant: "danger" };
     default:
       return { label: "Completed", variant: "success" };
   }
@@ -902,6 +930,14 @@ function loadOrdersFromStorage() {
       ...entry,
       createdAt: entry.createdAt ? new Date(entry.createdAt) : new Date(),
       items: (entry.items || []).map((item) => ({ ...item })),
+      cancellation: entry.cancellation
+        ? {
+            ...entry.cancellation,
+            cancelledAt: entry.cancellation.cancelledAt
+              ? new Date(entry.cancellation.cancelledAt)
+              : new Date(),
+          }
+        : undefined,
     }));
   } catch (error) {
     console.warn("Failed to load order history", error);
@@ -914,6 +950,14 @@ function saveOrdersToStorage() {
     const payload = orders.map((order) => ({
       ...order,
       createdAt: order.createdAt ? new Date(order.createdAt).toISOString() : undefined,
+      cancellation: order.cancellation
+        ? {
+            ...order.cancellation,
+            cancelledAt: order.cancellation.cancelledAt
+              ? new Date(order.cancellation.cancelledAt).toISOString()
+              : undefined,
+          }
+        : undefined,
     }));
     localStorage.setItem(ORDER_STORAGE_KEY, JSON.stringify(payload));
   } catch (error) {
@@ -926,6 +970,7 @@ function attachOrderSort() {
   const saved = localStorage.getItem(`${ORDER_STORAGE_KEY}.sort`);
   if (saved && ordersSortEl.querySelector(`option[value="${saved}"]`)) {
     ordersSortEl.value = saved;
+    renderOrders();
   }
   ordersSortEl.addEventListener("change", () => {
     localStorage.setItem(`${ORDER_STORAGE_KEY}.sort`, ordersSortEl.value);
@@ -947,4 +992,117 @@ function getSortedOrders() {
     default:
       return list.sort(compareDateDesc);
   }
+}
+
+function attachOrderActionHandlers() {
+  if (orderActionsBound) return;
+  orderActionsBound = true;
+  document.addEventListener("click", (event) => {
+    const actionButton = event.target.closest("[data-action]");
+    if (!actionButton) return;
+    const { action, orderId } = actionButton.dataset;
+    if (action === "cancel-order") {
+      event.preventDefault();
+      if (!orderId) return;
+      const targetOrder = orders.find((entry) => entry.id === orderId);
+      if (!targetOrder || targetOrder.status === "cancelled") return;
+      openCancelOrderModal(orderId);
+    }
+  });
+}
+
+function openCancelOrderModal(orderId) {
+  const modal = ensureCancelOrderModal();
+  cancelModalActiveOrderId = orderId;
+  if (cancelModalReasonEl) {
+    cancelModalReasonEl.value = CANCEL_REASONS[0]?.value || "";
+  }
+  if (cancelModalNotesEl) {
+    cancelModalNotesEl.value = "";
+  }
+  modal.classList.add("open");
+  cancelModalReasonEl?.focus();
+}
+
+function closeCancelOrderModal() {
+  if (!cancelModalEl) return;
+  cancelModalEl.classList.remove("open");
+  cancelModalActiveOrderId = null;
+}
+
+function ensureCancelOrderModal() {
+  if (cancelModalEl) return cancelModalEl;
+  const modal = document.createElement("div");
+  modal.className = "order-modal";
+  modal.innerHTML = `
+    <div class="order-modal-backdrop" data-cancel-modal-close></div>
+    <div class="order-modal-card" role="dialog" aria-modal="true" aria-labelledby="order-cancel-title">
+      <header>
+        <h3 id="order-cancel-title">Cancel order</h3>
+        <button type="button" class="order-modal-close" aria-label="Close dialog" data-cancel-modal-close>×</button>
+      </header>
+      <form id="order-cancel-form">
+        <label>
+          Reason
+          <select name="reason" required>
+            ${CANCEL_REASONS.map((reason) => `<option value="${reason.value}">${reason.label}</option>`).join("")}
+          </select>
+        </label>
+        <label>
+          Additional details (optional)
+          <textarea name="notes" rows="3" placeholder="Share more context"></textarea>
+        </label>
+        <div class="order-modal-actions">
+          <button type="button" class="btn ghost" data-cancel-modal-close>Close</button>
+          <button type="submit" class="btn primary">Submit cancellation</button>
+        </div>
+      </form>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  cancelModalEl = modal;
+  cancelModalFormEl = modal.querySelector("#order-cancel-form");
+  cancelModalReasonEl = cancelModalFormEl?.querySelector("select[name='reason']");
+  cancelModalNotesEl = cancelModalFormEl?.querySelector("textarea[name='notes']");
+  cancelModalCloseBtns = modal.querySelectorAll("[data-cancel-modal-close]");
+  cancelModalCloseBtns.forEach((btn) => btn.addEventListener("click", closeCancelOrderModal));
+  cancelModalFormEl?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    if (!cancelModalActiveOrderId) return;
+    const reason = cancelModalReasonEl?.value;
+    if (!reason) {
+      cancelModalReasonEl?.focus();
+      return;
+    }
+    const notes = cancelModalNotesEl?.value?.trim();
+    cancelOrder(cancelModalActiveOrderId, reason, notes);
+    closeCancelOrderModal();
+  });
+  modal.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      closeCancelOrderModal();
+    }
+  });
+  return cancelModalEl;
+}
+
+function cancelOrder(orderId, reason, notes) {
+  const target = orders.find((entry) => entry.id === orderId);
+  if (!target || target.status === "cancelled") return;
+  target.status = "cancelled";
+  const badge = getOrderStatusBadge("cancelled");
+  target.statusVariant = badge.variant;
+  target.statusLabel = badge.label;
+  target.paymentStatus = "Cancelled";
+  target.cancellation = {
+    reason,
+    notes,
+    cancelledAt: new Date(),
+  };
+  renderOrders();
+  saveOrdersToStorage();
+}
+
+function formatCancelReason(value) {
+  return CANCEL_REASONS.find((reason) => reason.value === value)?.label || "Cancelled";
 }
