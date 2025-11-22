@@ -773,16 +773,25 @@ function combineOrderItems(items) {
 }
 
 function buildOrderSummary(orderItems) {
+  const hasTickets = orderItems.some((item) => item.category === "Ticket");
+  const hasMerch = orderItems.some((item) => item.category === "Merch");
   const firstTicket = orderItems.find((item) => item.category === "Ticket");
-  if (firstTicket) {
-    const parts = [];
-    if (firstTicket.park) parts.push(firstTicket.park);
+  if (hasTickets && firstTicket) {
+    const parkName = firstTicket.park || "Park order";
+    if (hasMerch) {
+      return parkName;
+    }
+    const parts = [parkName];
     if (firstTicket.date) parts.push(formatDate(firstTicket.date));
     if (firstTicket.time) parts.push(firstTicket.time);
     const summary = parts.filter(Boolean).join(" · ");
     if (summary) {
       return summary;
     }
+    return parkName;
+  }
+  if (!hasTickets && hasMerch) {
+    return "Merchandise order";
   }
   if (orderItems.length === 1) {
     return orderItems[0].label;
