@@ -32,13 +32,16 @@
       <section class="orders-hero">
         <p class="eyebrow">Order history</p>
         <h1>My Orders</h1>
-        <p class="muted">
-          Every successful checkout, grouped by order ID with tickets, merchandise, payment status, and
-          receipts.
-        </p>
-        <div class="orders-hero-actions">
-          <a href="homepage.html#tickets" class="btn secondary">Buy more tickets</a>
-          <a href="merchandise.html" class="btn ghost">Browse merchandise</a>
+        <div class="orders-filters">
+          <label class="orders-filter">
+            <span>Sort by</span>
+            <select id="orders-sort">
+              <option value="date">Date (newest)</option>
+              <option value="date-asc">Date (oldest)</option>
+              <option value="total">Total price (high → low)</option>
+              <option value="total-asc">Total price (low → high)</option>
+            </select>
+          </label>
         </div>
       </section>
 
@@ -49,12 +52,7 @@
           <p class="muted">Orders are saved on this device. Future tickets and merch will appear here.</p>
           <a href="homepage.html#tickets" class="btn secondary">Start booking</a>
         </div>
-        <div
-          class="orders-grid orders-grid-full"
-          id="orders-list-full"
-          aria-live="polite"
-          aria-busy="false"
-        ></div>
+        <div class="orders-grid orders-grid-full" id="orders-list-full" aria-live="polite" aria-busy="false"></div>
       </section>
     </main>
 

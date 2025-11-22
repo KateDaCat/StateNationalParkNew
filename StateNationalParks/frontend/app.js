@@ -28,6 +28,7 @@ let ordersEmptyFullEl;
 let ordersHintEl;
 let ordersHintTextEl;
 let ordersViewAllBtn;
+let ordersSortEl;
 
 document.addEventListener("DOMContentLoaded", () => {
   cartDrawerEl = document.getElementById("cart-drawer");
@@ -45,6 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initTicketSummary();
   initOrders();
   attachScrollButtons();
+  attachOrderSort();
 });
 
 function attachFormHandlers() {
@@ -594,6 +596,7 @@ function initOrders() {
   ordersHintEl = document.getElementById("orders-hint");
   ordersHintTextEl = document.getElementById("orders-hint-text");
   ordersViewAllBtn = document.getElementById("orders-view-all");
+  ordersSortEl = document.getElementById("orders-sort");
   renderOrders();
 }
 
@@ -621,8 +624,9 @@ function renderOrders() {
 
 function renderOrdersInto({ listEl, emptyEl, limit }) {
   if (!listEl || !emptyEl) return;
+  const sorted = getSortedOrders();
   const entries =
-    typeof limit === "number" && Number.isFinite(limit) ? orders.slice(0, limit) : orders;
+    typeof limit === "number" && Number.isFinite(limit) ? sorted.slice(0, limit) : sorted;
   if (!entries.length) {
     listEl.innerHTML = "";
     emptyEl.style.display = "";
@@ -914,5 +918,33 @@ function saveOrdersToStorage() {
     localStorage.setItem(ORDER_STORAGE_KEY, JSON.stringify(payload));
   } catch (error) {
     console.warn("Failed to persist orders", error);
+  }
+}
+
+function attachOrderSort() {
+  if (!ordersSortEl) return;
+  const saved = localStorage.getItem(`${ORDER_STORAGE_KEY}.sort`);
+  if (saved && ordersSortEl.querySelector(`option[value="${saved}"]`)) {
+    ordersSortEl.value = saved;
+  }
+  ordersSortEl.addEventListener("change", () => {
+    localStorage.setItem(`${ORDER_STORAGE_KEY}.sort`, ordersSortEl.value);
+    renderOrders();
+  });
+}
+
+function getSortedOrders() {
+  const list = [...orders];
+  const sortMode = ordersSortEl?.value || "date";
+  const compareDateDesc = (a, b) => new Date(b.createdAt) - new Date(a.createdAt);
+  switch (sortMode) {
+    case "date-asc":
+      return list.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+    case "total":
+      return list.sort((a, b) => (b.total || 0) - (a.total || 0));
+    case "total-asc":
+      return list.sort((a, b) => (a.total || 0) - (b.total || 0));
+    default:
+      return list.sort(compareDateDesc);
   }
 }
