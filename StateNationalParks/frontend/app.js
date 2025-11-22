@@ -4,6 +4,7 @@ const activityEntries = [];
 const MAX_FEED_ITEMS = 6;
 const cartItems = [];
 const ORDER_STORAGE_KEY = "snparks.orders";
+const ORDER_STORAGE_VERSION = 2;
 const CANCEL_REASONS = [
   { value: "wrong_destination", label: "I chose the wrong destination" },
   { value: "wrong_time", label: "I chose the wrong date or time" },
@@ -919,8 +920,16 @@ function loadOrdersFromStorage() {
   try {
     const raw = localStorage.getItem(ORDER_STORAGE_KEY);
     if (!raw) return [];
-    const data = JSON.parse(raw);
-    if (!Array.isArray(data)) return [];
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) {
+      // legacy payload (v1) — drop to satisfy request to clear test orders
+      return [];
+    }
+    if (!parsed || typeof parsed !== "object") return [];
+    if (parsed.version !== ORDER_STORAGE_VERSION || !Array.isArray(parsed.orders)) {
+      return [];
+    }
+    const data = parsed.orders;
     return data.map((entry) => ({
       ...entry,
       createdAt: entry.createdAt ? new Date(entry.createdAt) : new Date(),
@@ -960,7 +969,13 @@ function saveOrdersToStorage() {
           }
         : undefined,
     }));
-    localStorage.setItem(ORDER_STORAGE_KEY, JSON.stringify(payload));
+    localStorage.setItem(
+      ORDER_STORAGE_KEY,
+      JSON.stringify({
+        version: ORDER_STORAGE_VERSION,
+        orders: payload,
+      })
+    );
   } catch (error) {
     console.warn("Failed to persist orders", error);
   }
@@ -1002,11 +1017,11 @@ function attachOrderActionHandlers() {
     const actionButton = event.target.closest("[data-action]");
     if (!actionButton) return;
     const { action, orderId } = actionButton.dataset;
-    if (action === "cancel-order") {
+      if (action === "cancel-order") {
       event.preventDefault();
       if (!orderId) return;
       const targetOrder = orders.find((entry) => entry.id === orderId);
-      if (!targetOrder || targetOrder.status === "cancelled") return;
+        if (!targetOrder || isCancellationLocked(targetOrder)) return;
       openCancelOrderModal(orderId);
     }
   });
@@ -1067,7 +1082,7 @@ function ensureCancelOrderModal() {
   cancelModalNotesEl = cancelModalFormEl?.querySelector("textarea[name='notes']");
   cancelModalCloseBtns = modal.querySelectorAll("[data-cancel-modal-close]");
   cancelModalCloseBtns.forEach((btn) => btn.addEventListener("click", closeCancelOrderModal));
-  cancelModalFormEl?.addEventListener("submit", (event) => {
+    cancelModalFormEl?.addEventListener("submit", (event) => {
     event.preventDefault();
     if (!cancelModalActiveOrderId) return;
     const reason = cancelModalReasonEl?.value;
@@ -1076,7 +1091,7 @@ function ensureCancelOrderModal() {
       return;
     }
     const notes = cancelModalNotesEl?.value?.trim();
-    cancelOrder(cancelModalActiveOrderId, reason, notes);
+      requestOrderCancellation(cancelModalActiveOrderId, reason, notes);
     closeCancelOrderModal();
   });
   modal.addEventListener("keydown", (event) => {
