@@ -1087,24 +1087,29 @@ function filterOrdersByView(list, view = "upcoming") {
 function attachOrderActionHandlers() {
   if (orderActionsBound) return;
   orderActionsBound = true;
-    document.addEventListener("click", (event) => {
+  document.addEventListener("click", (event) => {
     const actionButton = event.target.closest("[data-action]");
     if (!actionButton) return;
     const { action, orderId } = actionButton.dataset;
-      if (action === "cancel-order") {
+    if (action === "cancel-order") {
       event.preventDefault();
       if (!orderId) return;
       const targetOrder = orders.find((entry) => entry.id === orderId);
-        if (!targetOrder || isCancellationLocked(targetOrder)) return;
+      if (!targetOrder || isCancellationLocked(targetOrder)) return;
       openCancelOrderModal(orderId);
-      } else if (action === "show-qr") {
-        event.preventDefault();
-        if (!orderId) return;
-        openOrderQrModal(orderId);
+    } else if (action === "show-qr") {
+      event.preventDefault();
+      if (!orderId) return;
+      openOrderQrModal(orderId);
     }
   });
+}
+
+function attachOrdersFilterControls() {
   const viewButtons = document.querySelectorAll("[data-orders-view]");
+  if (!viewButtons.length) return;
   viewButtons.forEach((button) => {
+    button.classList.toggle("active", button.dataset.ordersView === ordersViewFilter);
     button.addEventListener("click", () => {
       const targetView = button.dataset.ordersView;
       if (!targetView || targetView === ordersViewFilter) return;
@@ -1113,7 +1118,6 @@ function attachOrderActionHandlers() {
       viewButtons.forEach((btn) => btn.classList.toggle("active", btn === button));
       renderOrders();
     });
-    button.classList.toggle("active", button.dataset.ordersView === ordersViewFilter);
   });
 }
 
