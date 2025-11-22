@@ -4,6 +4,11 @@ const activityEntries = [];
 const MAX_FEED_ITEMS = 6;
 const cartItems = [];
 const orders = [];
+const DEFAULT_CUSTOMER = {
+  id: "CUS-48201",
+  name: "Trail Explorer",
+  type: "Adventure member",
+};
 const ADULT_TICKET_PRICE = 45;
 const CHILD_TICKET_PRICE = 25;
 let cartDrawerEl;
@@ -594,13 +599,17 @@ function renderOrders() {
 
 function renderOrderCard(order) {
   const metaParts = getOrderMetaParts(order);
-  const metaHtml = metaParts.map((part) => `<span>${escapeHTML(part)}</span>`).join("");
+  const inventorySummary = metaParts.join(" · ") || "No line items";
+  const orderDateLabel = formatOrderTimestamp(order.createdAt);
+  const paymentBadge = `${order.paymentStatus || "Success"} · ${order.paymentId || ""}`.trim();
   const itemsHtml = order.items
     .map((item) => {
       const qtyLabel = item.quantity > 1 ? `${item.label} ×${item.quantity}` : item.label;
+      const categoryClass = item.category === "Ticket" ? "ticket" : item.category === "Merch" ? "merch" : "default";
       return `
         <li class="order-item">
           <div>
+            <span class="order-item-chip ${categoryClass}">${escapeHTML(item.category || "Item")}</span>
             <strong>${escapeHTML(qtyLabel)}</strong>
             <small>${escapeHTML(item.meta || "")}</small>
           </div>
@@ -610,19 +619,41 @@ function renderOrderCard(order) {
     .join("");
   return `
     <article class="order-card">
-      <header>
+      <header class="order-card-header">
         <div>
-          <p class="eyebrow">Order</p>
-          <h3>${escapeHTML(order.id)}</h3>
-          <p class="muted">${escapeHTML(order.summary)}</p>
+          <p class="eyebrow">Order ${escapeHTML(order.id)}</p>
+          <h3>${escapeHTML(order.summary)}</h3>
+          <p class="muted">Placed ${escapeHTML(orderDateLabel)}</p>
         </div>
-        <span class="ticket-status ${order.statusVariant || "success"}">${escapeHTML(order.statusLabel || "Paid")}</span>
+        <div class="order-status-group">
+          <span class="ticket-status ${order.statusVariant || "success"}">${escapeHTML(order.statusLabel || "Completed")}</span>
+          <span class="payment-pill">${escapeHTML(paymentBadge)}</span>
+        </div>
       </header>
-      <div class="order-meta">${metaHtml}</div>
+      <div class="order-meta-grid">
+        <div>
+          <span>Customer</span>
+          <strong>${escapeHTML(order.customerName || "Customer")}</strong>
+          <small>ID ${escapeHTML(order.customerId || "N/A")} · ${escapeHTML(order.customerType || "")}</small>
+        </div>
+        <div>
+          <span>Receipt</span>
+          <strong>${escapeHTML(order.receiptId || "Pending")}</strong>
+          <small>Payment ${escapeHTML(order.paymentId || "Pending")}</small>
+        </div>
+        <div>
+          <span>Contents</span>
+          <strong>${order.items.length} item${order.items.length === 1 ? "" : "s"}</strong>
+          <small>${escapeHTML(inventorySummary)}</small>
+        </div>
+      </div>
       <ul class="order-items">${itemsHtml}</ul>
       <div class="order-footer">
         <span>Total ${formatCurrency(order.total)}</span>
-        <button type="button" class="btn ghost small">View receipt</button>
+        <div class="order-footer-actions">
+          <button type="button" class="btn ghost small">Download receipt</button>
+          <button type="button" class="btn ghost small">Request refund</button>
+        </div>
       </div>
     </article>
   `;
@@ -656,16 +687,28 @@ function createOrderFromItems(items, overrides = {}) {
   const merchCount = orderItems
     .filter((entry) => entry.category === "Merch")
     .reduce((sum, entry) => sum + entry.quantity, 0);
+  const status = (overrides.status || "completed").toLowerCase();
+  const statusBadge = getOrderStatusBadge(status);
+  const paymentStatus =
+    overrides.paymentStatus ||
+    (status === "refunded" ? "Refunded" : status === "pending" ? "Authorized" : "Success");
   return {
     id: overrides.id || generateOrderId(),
     createdAt: overrides.createdAt ? new Date(overrides.createdAt) : new Date(),
-    statusVariant: overrides.statusVariant || "success",
-    statusLabel: overrides.statusLabel || "Paid",
+    status,
+    statusVariant: overrides.statusVariant || statusBadge.variant,
+    statusLabel: overrides.statusLabel || statusBadge.label,
     summary: overrides.summary || buildOrderSummary(orderItems),
     items: orderItems,
     total,
     ticketCount,
     merchCount,
+    paymentId: overrides.paymentId || generatePaymentId(),
+    paymentStatus,
+    receiptId: overrides.receiptId || generateReceiptId(),
+    customerId: overrides.customerId || DEFAULT_CUSTOMER.id,
+    customerName: overrides.customerName || DEFAULT_CUSTOMER.name,
+    customerType: overrides.customerType || DEFAULT_CUSTOMER.type,
   };
 }
 
@@ -713,9 +756,6 @@ function buildOrderSummary(orderItems) {
 
 function getOrderMetaParts(order) {
   const parts = [];
-  if (order.createdAt) {
-    parts.push(`Placed ${formatOrderTimestamp(order.createdAt)}`);
-  }
   if (order.ticketCount) {
     parts.push(`${order.ticketCount} ticket${order.ticketCount === 1 ? "" : "s"}`);
   }
@@ -727,8 +767,20 @@ function getOrderMetaParts(order) {
 }
 
 function generateOrderId() {
+  return generatePrefixedId("ORD");
+}
+
+function generatePaymentId() {
+  return generatePrefixedId("PAY");
+}
+
+function generateReceiptId() {
+  return generatePrefixedId("RCT");
+}
+
+function generatePrefixedId(prefix) {
   const random = Math.floor(100000 + Math.random() * 900000);
-  return `ORD-${random}`;
+  return `${prefix}-${random}`;
 }
 
 function formatOrderTimestamp(value) {
@@ -778,4 +830,15 @@ function escapeHTML(value) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
+}
+
+function getOrderStatusBadge(status) {
+  switch (status) {
+    case "pending":
+      return { label: "Pending", variant: "warning" };
+    case "refunded":
+      return { label: "Refunded", variant: "danger" };
+    default:
+      return { label: "Completed", variant: "success" };
+  }
 }
