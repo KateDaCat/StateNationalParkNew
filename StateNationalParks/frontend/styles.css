@@ -1370,6 +1370,10 @@ textarea:focus {
   align-items: center;
   text-align: center;
   gap: 1rem;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 3rem 0 4rem;
 }
 
 .review-copy {
