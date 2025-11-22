@@ -709,15 +709,19 @@ function renderOrderCard(order) {
       </div>
       ${cancellationNote}
       <ul class="order-items">${itemsHtml}</ul>
-      <div class="order-footer">
-        <span>Total ${formatCurrency(order.total)}</span>
-        <div class="order-footer-actions">
-          <button type="button" class="btn ghost small" data-action="show-qr" data-order-id="${order.id}">Show QR code</button>
-          <button type="button" class="btn ghost small" data-action="cancel-order" data-order-id="${order.id}" ${
-            isCancellationLocked(order) ? "disabled" : ""
-          }>${getCancelButtonLabel(order)}</button>
+        <div class="order-footer">
+          <span>Total ${formatCurrency(order.total)}</span>
+          <div class="order-footer-actions">
+            ${
+              order.status === "completed"
+                ? `<button type="button" class="btn ghost small" data-action="show-qr" data-order-id="${order.id}">Show QR code</button>`
+                : ""
+            }
+            <button type="button" class="btn ghost small" data-action="cancel-order" data-order-id="${order.id}" ${
+              isCancellationLocked(order) ? "disabled" : ""
+            }>${getCancelButtonLabel(order)}</button>
+          </div>
         </div>
-      </div>
     </article>
   `;
 }
