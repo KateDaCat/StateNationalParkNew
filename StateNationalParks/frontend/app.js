@@ -578,7 +578,7 @@ function summarizeCartQuantity(item) {
 }
 
 function addTicketEntriesToCart({ park, date, time, adults, kids }) {
-  for (let i = 0; i < adults; i += 1) {
+  if (adults > 0) {
     addItemToCart({
       category: "Ticket",
       label: `${park || "Park"} · Adult ticket`,
@@ -586,11 +586,11 @@ function addTicketEntriesToCart({ park, date, time, adults, kids }) {
       date,
       time,
       ticketType: "Adult",
-      quantity: 1,
+      quantity: adults,
       unitPrice: ADULT_TICKET_PRICE,
     });
   }
-  for (let i = 0; i < kids; i += 1) {
+  if (kids > 0) {
     addItemToCart({
       category: "Ticket",
       label: `${park || "Park"} · Child ticket`,
@@ -598,7 +598,7 @@ function addTicketEntriesToCart({ park, date, time, adults, kids }) {
       date,
       time,
       ticketType: "Child",
-      quantity: 1,
+      quantity: kids,
       unitPrice: CHILD_TICKET_PRICE,
     });
   }
