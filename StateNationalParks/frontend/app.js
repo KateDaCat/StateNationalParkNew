@@ -34,9 +34,6 @@ let ordersListEl;
 let ordersEmptyEl;
 let ordersListFullEl;
 let ordersEmptyFullEl;
-let ordersHintEl;
-let ordersHintTextEl;
-let ordersViewAllBtn;
 let ordersSortTriggerEl;
 let ordersSortMenuEl;
 let ordersViewFilter = "upcoming";
@@ -633,9 +630,6 @@ function initOrders() {
   ordersEmptyEl = document.getElementById("orders-empty");
   ordersListFullEl = document.getElementById("orders-list-full");
   ordersEmptyFullEl = document.getElementById("orders-empty-full");
-  ordersHintEl = document.getElementById("orders-hint");
-  ordersHintTextEl = document.getElementById("orders-hint-text");
-  ordersViewAllBtn = document.getElementById("orders-view-all");
   ordersSortTriggerEl = document.getElementById("orders-sort-trigger");
   ordersSortMenuEl = document.getElementById("orders-sort-menu");
   const storedView = localStorage.getItem(`${ORDER_STORAGE_KEY}.view`);
@@ -658,16 +652,6 @@ function renderOrders() {
     emptyEl: ordersEmptyFullEl,
     view: ordersViewFilter,
   });
-  const hasOrders = orders.length > 0;
-  if (ordersHintEl) {
-    ordersHintEl.style.display = hasOrders ? "" : "none";
-    if (ordersHintTextEl) {
-      ordersHintTextEl.textContent = orders.length > 1 ? "Showing your most recent order." : "Your latest order will appear here.";
-    }
-  }
-  if (ordersViewAllBtn) {
-    ordersViewAllBtn.style.display = hasOrders ? "" : "none";
-  }
   updateOrdersEmptyFullMessage();
 }
 
@@ -705,7 +689,6 @@ function renderOrderCard(order) {
   const inventorySummary = metaParts.join(" · ") || "No line items";
   const orderDateLabel = formatOrderTimestamp(order.createdAt);
   const paymentBadge = `${order.paymentStatus || "Success"} · ${order.paymentId || ""}`.trim();
-  const cancellationNote = renderCancellationNote(order);
   const itemsHtml = order.items
     .map((item) => {
       const qtyLabel = item.quantity > 1 ? `${item.label} ×${item.quantity}` : item.label;
@@ -751,7 +734,7 @@ function renderOrderCard(order) {
           <small>${escapeHTML(inventorySummary)}</small>
         </div>
       </div>
-      ${cancellationNote}
+      ${renderCancellationNote(order)}
       <ul class="order-items">${itemsHtml}</ul>
         <div class="order-footer">
           <span>Total ${formatCurrency(order.total)}</span>
