@@ -20,6 +20,7 @@ const DEFAULT_CUSTOMER = {
 };
 const ADULT_TICKET_PRICE = 45;
 const CHILD_TICKET_PRICE = 25;
+const CANCELLATION_WINDOW_DAYS = 0;
 let cartDrawerEl;
 let cartButtonEl;
 let cartOverlayEl;
@@ -493,6 +494,14 @@ function initTicketSummary() {
   };
   const confirmBtn = document.getElementById("ticket-confirm");
   const ticketForm = document.getElementById("ticket-form");
+  const dateInput = ticketForm?.querySelector('input[name="date"]');
+  if (dateInput) {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, "0");
+    const dd = String(today.getDate()).padStart(2, "0");
+    dateInput.min = `${yyyy}-${mm}-${dd}`;
+  }
   if (confirmBtn && ticketForm) {
     confirmBtn.addEventListener("click", () => {
       if (!ticketForm.checkValidity()) {
@@ -622,6 +631,10 @@ function initOrders() {
   ordersSortEl = document.getElementById("orders-sort");
   ordersSortTriggerEl = document.getElementById("orders-sort-trigger");
   ordersSortMenuEl = document.getElementById("orders-sort-menu");
+  const storedView = localStorage.getItem(`${ORDER_STORAGE_KEY}.view`);
+  if (storedView === "upcoming" || storedView === "past") {
+    ordersViewFilter = storedView;
+  }
   renderOrders();
   attachOrdersFilterControls();
 }
@@ -1081,9 +1094,11 @@ function attachOrderActionHandlers() {
       const targetView = button.dataset.ordersView;
       if (!targetView || targetView === ordersViewFilter) return;
       ordersViewFilter = targetView;
+      localStorage.setItem(`${ORDER_STORAGE_KEY}.view`, ordersViewFilter);
       viewButtons.forEach((btn) => btn.classList.toggle("active", btn === button));
       renderOrders();
     });
+    button.classList.toggle("active", button.dataset.ordersView === ordersViewFilter);
   });
 }
 
@@ -1185,13 +1200,23 @@ function formatCancelReason(value) {
 }
 
 function isCancellationLocked(order) {
-  return order.status === "cancelled" || order.status === "cancel_pending";
+  if (order.status === "cancelled" || order.status === "cancel_pending") {
+    return true;
+  }
+  if (order.items?.length) {
+    const tickets = order.items.filter((item) => item.category === "Ticket");
+    if (tickets.length) {
+      const futureTicketExists = tickets.some((ticket) => !isTicketInPast(ticket));
+      return !futureTicketExists;
+    }
+  }
+  return false;
 }
 
 function getCancelButtonLabel(order) {
   if (order.status === "cancelled") return "Cancelled";
   if (order.status === "cancel_pending") return "Cancel pending";
-  return "Cancel order";
+  return isCancellationLocked(order) ? "Cancellation unavailable" : "Cancel order";
 }
 
 function renderCancellationNote(order) {
@@ -1199,12 +1224,12 @@ function renderCancellationNote(order) {
   if (!info) return "";
   if (info.status === "requested" || order.status === "cancel_pending") {
     const requestedAt = info.requestedAt ? formatOrderTimestamp(info.requestedAt) : "recently";
-    return `<div class="order-note">
-      <strong>Cancellation requested ${escapeHTML(requestedAt)}</strong>
-      <small>${escapeHTML(formatCancelReason(info.reason))}${
-        info.notes ? ` — ${escapeHTML(info.notes)}` : ""
-      } · Refund will be processed once approved.</small>
-    </div>`;
+      return `<div class="order-note">
+        <strong>Cancellation requested ${escapeHTML(requestedAt)}</strong>
+        <small>${escapeHTML(formatCancelReason(info.reason))}${
+          info.notes ? ` — ${escapeHTML(info.notes)}` : ""
+        } · Refund will be processed once approved.</small>
+      </div>`;
   }
   if (info.status === "resolved" || info.cancelledAt || order.status === "cancelled") {
     const cancelledAt = info.cancelledAt ? formatOrderTimestamp(info.cancelledAt) : "recently";
