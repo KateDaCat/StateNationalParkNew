@@ -1664,6 +1664,28 @@ textarea:focus {
   flex-wrap: wrap;
 }
 
+.profile-hero-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.profile-hero-content ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 2rem;
+  font-size: 0.95rem;
+}
+
+.profile-hero-content li {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
 .profile-avatar-large {
   width: 80px;
   height: 80px;
@@ -1687,39 +1709,12 @@ textarea:focus {
   gap: 1.5rem;
 }
 
-.profile-card {
-  background: rgba(255, 255, 255, 0.92);
-  border: 1px solid var(--border);
-  border-radius: 1.25rem;
-  padding: 1.75rem;
-  box-shadow: var(--shadow);
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.profile-card ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.profile-card li {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-}
-
-.profile-card strong {
-  color: var(--muted);
-  font-size: 0.9rem;
-}
-
+.profile-card,
+.profile-card ul,
+.profile-card li,
+.profile-card strong,
 .profile-card span {
-  font-weight: 600;
+  display: none;
 }
 
 footer {

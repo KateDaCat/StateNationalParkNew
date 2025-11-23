@@ -1606,8 +1606,16 @@ function initMockAuthState() {
     }
   };
 
-  signOutBtn?.addEventListener("click", handleSignOut);
-  profileSignOutBtn?.addEventListener("click", handleSignOut);
+  signOutBtn?.addEventListener("click", () => {
+    if (window.confirm("Sign out of your profile?")) {
+      handleSignOut();
+    }
+  });
+  profileSignOutBtn?.addEventListener("click", () => {
+    if (window.confirm("Sign out of your profile?")) {
+      handleSignOut();
+    }
+  });
 
   const handleAuthSuccess = () => {
     localStorage.setItem(AUTH_STORAGE_KEY, "true");
