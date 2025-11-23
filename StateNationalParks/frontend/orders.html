@@ -23,8 +23,10 @@
         <a href="homepage.html#tickets">Tickets</a>
         <a href="orders.html" aria-current="page">My Orders</a>
         <a href="merchandise.html">Merchandise</a>
-        <a href="signin.html" class="btn ghost small">Sign in</a>
-        <a href="signup.html" class="btn primary small">Create account</a>
+        <a href="signin.html" class="btn ghost small nav-auth-link" data-auth-visible="signed-out">Sign in</a>
+        <a href="signup.html" class="btn primary small nav-auth-link" data-auth-visible="signed-out">Create account</a>
+        <a href="orders.html" class="btn primary small nav-auth-link" data-auth-visible="signed-in">My dashboard</a>
+        <button type="button" class="btn ghost small nav-auth-link" data-auth-visible="signed-in" id="nav-signout">Sign out</button>
       </nav>
     </header>
 

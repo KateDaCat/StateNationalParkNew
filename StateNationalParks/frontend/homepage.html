@@ -18,14 +18,16 @@
         <span class="accent-dot"></span>
         State National Parks
       </div>
-        <nav class="nav-links">
+          <nav class="nav-links">
           <a href="homepage.html#access">Home</a>
               <a href="homepage.html#tickets">Tickets</a>
               <a href="homepage.html#my-orders">My Orders</a>
-          <a href="merchandise.html">Merchandise</a>
-          <a href="signin.html" class="btn ghost small">Sign in</a>
-          <a href="signup.html" class="btn primary small">Create account</a>
-        </nav>
+            <a href="merchandise.html">Merchandise</a>
+            <a href="signin.html" class="btn ghost small nav-auth-link" data-auth-visible="signed-out">Sign in</a>
+            <a href="signup.html" class="btn primary small nav-auth-link" data-auth-visible="signed-out">Create account</a>
+            <a href="orders.html" class="btn primary small nav-auth-link" data-auth-visible="signed-in">My dashboard</a>
+            <button type="button" class="btn ghost small nav-auth-link" data-auth-visible="signed-in" id="nav-signout">Sign out</button>
+          </nav>
       </header>
 
         <section

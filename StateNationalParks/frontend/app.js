@@ -5,6 +5,7 @@ const MAX_FEED_ITEMS = 6;
 const cartItems = [];
 const ORDER_STORAGE_KEY = "snparks.orders";
 const ORDER_STORAGE_VERSION = 2;
+const AUTH_STORAGE_KEY = "snparks.authenticated";
 const CANCEL_REASONS = [
   { value: "wrong_destination", label: "I chose the wrong destination" },
   { value: "wrong_time", label: "I chose the wrong date or time" },
@@ -1433,6 +1434,51 @@ function validateReviewForm() {
     return false;
   }
   return true;
+}
+
+function initMockAuthState() {
+  const authElements = document.querySelectorAll("[data-auth-visible]");
+  const signOutBtn = document.getElementById("nav-signout");
+  const signInForm = document.getElementById("signin-form");
+  const signUpForm = document.getElementById("signup-form");
+
+  const syncAuthUI = () => {
+    const isSignedIn = isUserSignedIn();
+    authElements.forEach((element) => {
+      const shouldShow =
+        element.dataset.authVisible === "signed-in" ? isSignedIn : !isSignedIn;
+      element.style.display = shouldShow ? "" : "none";
+    });
+  };
+
+  signOutBtn?.addEventListener("click", () => {
+    localStorage.removeItem(AUTH_STORAGE_KEY);
+    syncAuthUI();
+    if (!window.location.pathname.endsWith("homepage.html")) {
+      window.location.href = "homepage.html";
+    }
+  });
+
+  const handleAuthSuccess = () => {
+    localStorage.setItem(AUTH_STORAGE_KEY, "true");
+    window.location.href = "homepage.html#my-orders";
+  };
+
+  signInForm?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    handleAuthSuccess();
+  });
+
+  signUpForm?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    handleAuthSuccess();
+  });
+
+  syncAuthUI();
+}
+
+function isUserSignedIn() {
+  return localStorage.getItem(AUTH_STORAGE_KEY) === "true";
 }
 
 function isOrderPast(order) {
