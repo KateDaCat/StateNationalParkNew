@@ -143,6 +143,11 @@ code {
   cursor: pointer;
 }
 
+.nav-auth-link-group {
+  display: inline-flex;
+  gap: 0.5rem;
+}
+
 .btn:hover {
   transform: translateY(-1px);
 }

@@ -18,18 +18,19 @@
         <span class="accent-dot"></span>
         State National Parks
       </div>
-      <nav class="nav-links">
-        <a href="homepage.html#access">Home</a>
-        <a href="homepage.html#tickets">Tickets</a>
-        <a href="orders.html" aria-current="page">My Orders</a>
-        <a href="merchandise.html">Merchandise</a>
-        <a href="signin.html" class="btn ghost small nav-auth-link" data-auth-visible="signed-out">Sign in</a>
-        <a href="signup.html" class="btn primary small nav-auth-link" data-auth-visible="signed-out">Create account</a>
-        <a href="profile.html" class="nav-avatar nav-auth-link" data-auth-visible="signed-in" aria-label="Profile">
-          <span>EX</span>
-        </a>
-        <button type="button" class="btn ghost small nav-auth-link" data-auth-visible="signed-in" id="nav-signout">Sign out</button>
-      </nav>
+        <nav class="nav-links">
+          <a href="homepage.html#access">Home</a>
+          <a href="homepage.html#tickets">Tickets</a>
+          <a href="orders.html" aria-current="page">My Orders</a>
+          <a href="merchandise.html">Merchandise</a>
+          <div class="nav-auth-link-group" data-auth-visible="signed-out">
+            <a href="signin.html" class="btn ghost small">Sign in</a>
+            <a href="signup.html" class="btn primary small">Create account</a>
+          </div>
+          <a href="profile.html" class="nav-avatar nav-auth-link" data-auth-visible="signed-in" aria-label="Profile">
+            <span>EX</span>
+          </a>
+        </nav>
     </header>
 
     <main class="orders-main">
