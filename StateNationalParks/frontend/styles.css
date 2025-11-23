@@ -352,6 +352,44 @@ section {
   width: fit-content;
 }
 
+.merch-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.merch-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+}
+
+.merch-preview-card {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  padding: 1rem;
+  box-shadow: var(--shadow);
+}
+
+.merch-preview-card img {
+  width: 96px;
+  height: 96px;
+  object-fit: cover;
+  border-radius: 0.85rem;
+}
+
+.merch-preview-content h3 {
+  margin: 0 0 0.25rem;
+}
+
+.merch-preview-link {
+  align-self: flex-start;
+}
+
 .ticket-forms .form-card {
   height: 100%;
 }

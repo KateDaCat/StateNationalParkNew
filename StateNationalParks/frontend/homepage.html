@@ -38,7 +38,7 @@
         ></section>
 
       <main>
-        <section id="access">
+        <section id="access" data-auth-visible="signed-out">
           <div class="section-heading">
             <p class="eyebrow">Account access</p>
             <h2>Sign in or create an account before touching tickets</h2>
@@ -53,6 +53,40 @@
             <a href="signup.html" class="btn secondary">Create account</a>
           </article>
         </div>
+      </section>
+
+      <section class="merch-preview">
+        <div class="section-heading">
+          <p class="eyebrow">New arrivals</p>
+          <h2>Fresh drops from the park store</h2>
+        </div>
+        <div class="merch-preview-grid">
+          <article class="merch-preview-card">
+            <img src="images/tshirt.jpeg" alt="Graphic Tee" />
+            <div class="merch-preview-content">
+              <h3>Graphic Tee</h3>
+              <p class="muted">RM55 · breathable organic cotton</p>
+              <button class="btn secondary" data-scroll-to="tickets">View details</button>
+            </div>
+          </article>
+          <article class="merch-preview-card">
+            <img src="images/notebook.jpeg" alt="Field Notebook" />
+            <div class="merch-preview-content">
+              <h3>Field Notebook</h3>
+              <p class="muted">RM28 · recycled paper, grid pages</p>
+              <button class="btn secondary" data-scroll-to="tickets">View details</button>
+            </div>
+          </article>
+          <article class="merch-preview-card">
+            <img src="images/mug.jpeg" alt="Insulated Mug" />
+            <div class="merch-preview-content">
+              <h3>Insulated Mug</h3>
+              <p class="muted">RM38 · keeps drinks hot for 6h</p>
+              <button class="btn secondary" data-scroll-to="tickets">View details</button>
+            </div>
+          </article>
+        </div>
+        <a href="merchandise.html" class="btn ghost small merch-preview-link">Browse merchandise</a>
       </section>
 
         <section id="tickets">
