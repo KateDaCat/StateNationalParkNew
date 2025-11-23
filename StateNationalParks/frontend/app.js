@@ -20,6 +20,7 @@ const MOCK_REVIEWS = [
     rating: 5,
     comment: "Loved the guided night safari. Friendly rangers and well-marked trails.",
     date: "2025-01-08",
+    photos: ["images/nationalpark.jpeg", "images/umbrella.jpeg"],
   },
   {
     id: "REV-002",
@@ -27,6 +28,7 @@ const MOCK_REVIEWS = [
     rating: 4,
     comment: "Ticket pickup was smooth, though the parking signage could be clearer.",
     date: "2025-01-04",
+    photos: [],
   },
   {
     id: "REV-003",
@@ -34,6 +36,7 @@ const MOCK_REVIEWS = [
     rating: 5,
     comment: "Kids loved the education center. Queue times were short on weekday mornings.",
     date: "2024-12-29",
+    photos: ["images/totebag.jpeg"],
   },
   {
     id: "REV-004",
@@ -41,6 +44,7 @@ const MOCK_REVIEWS = [
     rating: 3,
     comment: "Hoodie quality was great but delivery took longer than expected.",
     date: "2024-12-20",
+    photos: ["images/hoodie.jpeg"],
   },
   {
     id: "REV-005",
@@ -48,6 +52,7 @@ const MOCK_REVIEWS = [
     rating: 4,
     comment: "Camping permits were easy to obtain. Please add more water refill points.",
     date: "2024-12-15",
+    photos: [],
   },
 ];
 let orders = loadOrdersFromStorage();
@@ -1502,7 +1507,7 @@ function initReviewGallery() {
 function renderReviewPreview() {
   if (!reviewListEl) return;
   const preview = getSortedReviews("newest").slice(0, 3);
-  reviewListEl.innerHTML = preview.map(renderReviewCard).join("");
+  reviewListEl.innerHTML = preview.map((review) => renderReviewCard(review)).join("");
 }
 
 function openReviewListModal() {
@@ -1522,7 +1527,9 @@ function renderReviewFullList() {
   if (!reviewListFullEl) return;
   const mode = reviewListSortSelect?.value || "newest";
   const sorted = getSortedReviews(mode);
-  reviewListFullEl.innerHTML = sorted.map(renderReviewCard).join("");
+  reviewListFullEl.innerHTML = sorted
+    .map((review) => renderReviewCard(review, { showImages: true }))
+    .join("");
 }
 
 function getSortedReviews(mode) {
@@ -1534,26 +1541,41 @@ function getSortedReviews(mode) {
       return list.sort((a, b) => b.rating - a.rating || new Date(b.date) - new Date(a.date));
     case "rating-low":
       return list.sort((a, b) => a.rating - b.rating || new Date(b.date) - new Date(a.date));
+    case "photos":
+      return list.sort(
+        (a, b) => (b.photos?.length || 0) - (a.photos?.length || 0) || new Date(b.date) - new Date(a.date)
+      );
     default:
       return list.sort((a, b) => new Date(b.date) - new Date(a.date));
   }
 }
 
-function renderReviewCard(review) {
+function renderReviewCard(review, options = {}) {
+  const { showImages = false } = options;
   const stars = "★".repeat(review.rating) + "☆".repeat(5 - review.rating);
   const formattedDate = new Date(review.date).toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
   });
+  const photos =
+    showImages && review.photos?.length
+      ? `<div class="review-photo-grid">
+          ${review.photos
+            .slice(0, 3)
+            .map((src) => `<img src="${src}" alt="Review photo" />`)
+            .join("")}
+        </div>`
+      : "";
   return `
     <article class="review-card">
-      <header>
+      <div class="review-comment-header">
         <strong>${escapeHTML(review.name)}</strong>
         <span class="review-rating">${stars}</span>
-      </header>
-      <p class="muted review-date">${formattedDate}</p>
-      <p>${escapeHTML(review.comment)}</p>
+      </div>
+      <p class="review-comment-text">${escapeHTML(review.comment)}</p>
+      ${photos}
+      <small class="review-date">${formattedDate}</small>
     </article>
   `;
 }
