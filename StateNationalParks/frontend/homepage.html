@@ -18,14 +18,17 @@
         <span class="accent-dot"></span>
         State National Parks
       </div>
-        <nav class="nav-links">
+          <nav class="nav-links">
           <a href="homepage.html#access">Home</a>
               <a href="homepage.html#tickets">Tickets</a>
               <a href="homepage.html#my-orders">My Orders</a>
-          <a href="merchandise.html">Merchandise</a>
-          <a href="signin.html" class="btn ghost small">Sign in</a>
-          <a href="signup.html" class="btn primary small">Create account</a>
-        </nav>
+            <a href="merchandise.html">Merchandise</a>
+            <a href="signin.html" class="btn ghost small nav-auth-link" data-auth-visible="signed-out">Sign in</a>
+            <a href="signup.html" class="btn primary small nav-auth-link" data-auth-visible="signed-out">Create account</a>
+            <a href="profile.html" class="nav-avatar nav-auth-link" data-auth-visible="signed-in" aria-label="Profile">
+              <span>EX</span>
+            </a>
+          </nav>
       </header>
 
         <section
@@ -35,7 +38,7 @@
         ></section>
 
       <main>
-        <section id="access">
+        <section id="access" data-auth-visible="signed-out">
           <div class="section-heading">
             <p class="eyebrow">Account access</p>
             <h2>Sign in or create an account before touching tickets</h2>
@@ -50,6 +53,34 @@
             <a href="signup.html" class="btn secondary">Create account</a>
           </article>
         </div>
+      </section>
+
+      <section class="merch-preview">
+        <div class="section-heading">
+          <p class="eyebrow">New arrivals</p>
+          <h2>Fresh drops from the park store</h2>
+        </div>
+        <div class="merch-preview-grid">
+          <article class="merch-preview-card">
+            <img src="images/tshirt.jpeg" alt="Graphic Tee" />
+            <div class="merch-preview-content">
+              <h3>Graphic Tee</h3>
+            </div>
+          </article>
+          <article class="merch-preview-card">
+            <img src="images/notebook.jpeg" alt="Field Notebook" />
+            <div class="merch-preview-content">
+              <h3>Field Notebook</h3>
+            </div>
+          </article>
+          <article class="merch-preview-card">
+            <img src="images/mug.jpeg" alt="Insulated Mug" />
+            <div class="merch-preview-content">
+              <h3>Insulated Mug</h3>
+            </div>
+          </article>
+        </div>
+        <a href="merchandise.html" class="btn ghost small merch-preview-link">Browse merchandise</a>
       </section>
 
         <section id="tickets">
@@ -131,24 +162,21 @@
       </section>
 
           <section id="my-orders">
-          <div class="section-heading">
-              <p class="eyebrow">My orders</p>
-              <h2>Track every purchase in one place</h2>
-            <p class="muted">
-                Each checkout groups tickets and merchandise into an order with its own ID, payment status, and timeline.
-            </p>
-          </div>
+            <div class="section-heading">
+                <p class="eyebrow">My orders</p>
+                <h2>Track every purchase in one place</h2>
+              <p class="muted">
+                  Your latest tickets and merchandise appear here as soon as you check out.
+              </p>
+            </div>
             <div class="orders-empty" id="orders-empty">
               <p class="eyebrow">No orders yet</p>
-              <h3>Checkout to see your first order</h3>
-              <p class="muted">Tickets and merch purchased together will be grouped under one order ID.</p>
+                <h3>No history on this device</h3>
+                <p class="muted">Start a checkout to see upcoming tickets and deliveries.</p>
               <button type="button" class="btn secondary" data-scroll-to="tickets">Browse tickets</button>
             </div>
             <div class="orders-grid orders-grid-compact" id="orders-list" aria-live="polite" aria-busy="false"></div>
-            <div class="orders-hint" id="orders-hint" style="display: none;">
-              <p class="muted" id="orders-hint-text">Showing your latest order.</p>
-              <a class="btn ghost small" id="orders-view-all" href="orders.html">View all orders</a>
-            </div>
+              <a class="btn ghost small orders-view-link" href="orders.html">View all orders</a>
           
         </section>
 
@@ -157,6 +185,11 @@
             <h2>Rate us</h2>
             <p class="muted review-copy">Tell us how your visit went — help us improve the experience for every explorer.</p>
             <button type="button" class="btn primary review-open-btn" id="review-open-btn">Write a review</button>
+          </section>
+
+          <section class="review-list-section">
+            <div class="review-list" id="review-list"></div>
+            <button type="button" class="btn ghost small" id="review-view-all">More reviews</button>
           </section>
 
           <div class="review-modal" id="review-modal" aria-hidden="true">
@@ -206,6 +239,29 @@
               </form>
             </div>
           </div>
+
+          <div class="review-list-modal" id="review-list-modal" aria-hidden="true">
+            <div class="review-modal-backdrop" data-review-list-close></div>
+            <div class="review-list-card">
+              <header>
+                <h3>All reviews</h3>
+                <button type="button" class="review-modal-close" aria-label="Close dialog" data-review-list-close>×</button>
+              </header>
+              <div class="review-list-toolbar">
+                <label>
+                  Sort by
+                  <select id="review-list-sort">
+                    <option value="newest">Date · newest first</option>
+                    <option value="oldest">Date · oldest first</option>
+                    <option value="rating-high">Rating · high to low</option>
+                    <option value="rating-low">Rating · low to high</option>
+                    <option value="photos">Reviews with photos</option>
+                  </select>
+                </label>
+              </div>
+              <div class="review-list review-list-full" id="review-list-full"></div>
+            </div>
+          </div>
     </main>
 
         <button class="cart-fab" id="cart-button" aria-haspopup="true" aria-expanded="false">
@@ -245,15 +301,7 @@
         </aside>
 
       <footer>
-      <div>
-        <p class="eyebrow">Need to test?</p>
-        <p>
-          Serve this folder (e.g. <code>python -m http.server</code>) and open
-          <code>homepage.html</code>. Sign flows sit in
-          <code>signin.html</code> and <code>signup.html</code>.
-        </p>
-      </div>
-      <p class="muted">Frontend-only reference derived from finalUMLdrawio.png</p>
+        <p class="muted">© State National Parks · Demo frontend</p>
     </footer>
 
     <script src="app.js" defer></script>

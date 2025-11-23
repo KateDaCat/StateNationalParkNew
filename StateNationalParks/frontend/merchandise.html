@@ -22,10 +22,13 @@
           <a href="homepage.html#access">Home</a>
           <a href="homepage.html#tickets">Tickets</a>
           <a href="homepage.html#my-orders">My Orders</a>
-        <a href="merchandise.html">Merchandise</a>
-        <a href="signin.html" class="btn ghost small">Sign in</a>
-        <a href="signup.html" class="btn primary small">Create account</a>
-      </nav>
+          <a href="merchandise.html">Merchandise</a>
+          <a href="signin.html" class="btn ghost small nav-auth-link" data-auth-visible="signed-out">Sign in</a>
+          <a href="signup.html" class="btn primary small nav-auth-link" data-auth-visible="signed-out">Create account</a>
+          <a href="profile.html" class="nav-avatar nav-auth-link" data-auth-visible="signed-in" aria-label="Profile">
+            <span>EX</span>
+          </a>
+        </nav>
     </header>
 
     <section class="merch-hero">
@@ -545,61 +548,16 @@
         </div>
       </section>
 
-      <section class="highlight-promo">
-        <div class="highlight-text">
-          <p class="eyebrow">Limited offer</p>
-          <h2>Buy 1 Get 1 Free</h2>
-          <p>Signature ice-cream tubs inspired by famous park flavors.</p>
-          <div class="countdown">
-            <div>
-              <span>03</span>
-              <small>Days</small>
-            </div>
-            <div>
-              <span>12</span>
-              <small>Hours</small>
-            </div>
-            <div>
-              <span>45</span>
-              <small>Mins</small>
-            </div>
-          </div>
-        </div>
-        <img src="https://images.unsplash.com/photo-1504753793650-d4a2b783c15e?auto=format&fit=crop&w=700&q=80" alt="Ice cream tubs" />
-      </section>
-
-      <section class="info-section">
-        <div class="info-grid">
-          <article>
-            <h4>🚚 Fast Shipping</h4>
-            <p class="muted">Nationwide delivery from our park depot.</p>
-          </article>
-          <article>
-            <h4>♻️ Sustainable Picks</h4>
-            <p class="muted">Materials vetted for responsible sourcing.</p>
-          </article>
-          <article>
-            <h4>💬 Support</h4>
-            <p class="muted">Email or chat to adjust orders.</p>
-          </article>
-        </div>
-        <div class="info-links">
+        <section class="info-links condensed">
           <div>
-            <h4>Help</h4>
-            <a href="#">Shipping</a>
-            <a href="#">Exchanges</a>
-            <a href="#">Store policy</a>
+            <h4>Pickup only</h4>
+            <p class="muted">All merchandise is collected at the park store. Please plan your pickup slot along with your visit.</p>
           </div>
           <div>
-            <h4>Payment</h4>
-            <div class="payment-row">
-              <span>VISA</span>
-              <span>MASTERCARD</span>
-              <span>PAYPAL</span>
-            </div>
+            <h4>Pick up with QR</h4>
+            <p class="muted">Use the QR code in “My Orders” to collect your merch on-site—no paper receipts needed.</p>
           </div>
-        </div>
-      </section>
+        </section>
     </main>
 
     <button class="cart-fab" id="cart-button" aria-haspopup="true" aria-expanded="false">

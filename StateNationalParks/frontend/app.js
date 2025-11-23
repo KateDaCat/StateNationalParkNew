@@ -5,12 +5,55 @@ const MAX_FEED_ITEMS = 6;
 const cartItems = [];
 const ORDER_STORAGE_KEY = "snparks.orders";
 const ORDER_STORAGE_VERSION = 2;
+const AUTH_STORAGE_KEY = "snparks.authenticated";
 const CANCEL_REASONS = [
   { value: "wrong_destination", label: "I chose the wrong destination" },
   { value: "wrong_time", label: "I chose the wrong date or time" },
   { value: "change_plans", label: "My plans have changed" },
   { value: "payment_issue", label: "Payment or billing issue" },
   { value: "other", label: "Other reason" },
+];
+const MOCK_REVIEWS = [
+  {
+    id: "REV-001",
+    name: "Example Explorer",
+    rating: 5,
+    comment: "Loved the guided night safari. Friendly rangers and well-marked trails.",
+    date: "2025-01-08",
+    photos: ["images/nationalpark.jpeg", "images/umbrella.jpeg"],
+  },
+  {
+    id: "REV-002",
+    name: "Trail Tester",
+    rating: 4,
+    comment: "Ticket pickup was smooth, though the parking signage could be clearer.",
+    date: "2025-01-04",
+    photos: [],
+  },
+  {
+    id: "REV-003",
+    name: "Family Adventurer",
+    rating: 5,
+    comment: "Kids loved the education center. Queue times were short on weekday mornings.",
+    date: "2024-12-29",
+    photos: ["images/totebag.jpeg"],
+  },
+  {
+    id: "REV-004",
+    name: "Merch Collector",
+    rating: 3,
+    comment: "Hoodie quality was great but delivery took longer than expected.",
+    date: "2024-12-20",
+    photos: ["images/hoodie.jpeg"],
+  },
+  {
+    id: "REV-005",
+    name: "Weekend Camper",
+    rating: 4,
+    comment: "Camping permits were easy to obtain. Please add more water refill points.",
+    date: "2024-12-15",
+    photos: [],
+  },
 ];
 let orders = loadOrdersFromStorage();
 const DEFAULT_CUSTOMER = {
@@ -56,6 +99,12 @@ let reviewRatingInput;
 let reviewWordCountEl;
 let reviewCommentEl;
 let reviewPhotosInput;
+let reviewListEl;
+let reviewListFullEl;
+let reviewListModalEl;
+let reviewListCloseBtns;
+let reviewListSortSelect;
+let reviewViewAllBtn;
 
 document.addEventListener("DOMContentLoaded", () => {
   cartDrawerEl = document.getElementById("cart-drawer");
@@ -76,6 +125,7 @@ document.addEventListener("DOMContentLoaded", () => {
   attachOrderSort();
   attachOrderActionHandlers();
   initReviewModal();
+  initReviewGallery();
 });
 
 function attachFormHandlers() {
@@ -1433,6 +1483,155 @@ function validateReviewForm() {
     return false;
   }
   return true;
+}
+
+function initReviewGallery() {
+  reviewListEl = document.getElementById("review-list");
+  reviewListFullEl = document.getElementById("review-list-full");
+  reviewListModalEl = document.getElementById("review-list-modal");
+  reviewListSortSelect = document.getElementById("review-list-sort");
+  reviewViewAllBtn = document.getElementById("review-view-all");
+  if (!reviewListEl) return;
+  renderReviewPreview();
+  reviewViewAllBtn?.addEventListener("click", openReviewListModal);
+  reviewListCloseBtns = reviewListModalEl?.querySelectorAll("[data-review-list-close]");
+  reviewListCloseBtns?.forEach((btn) => btn.addEventListener("click", closeReviewListModal));
+  reviewListModalEl?.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      closeReviewListModal();
+    }
+  });
+  reviewListSortSelect?.addEventListener("change", renderReviewFullList);
+}
+
+function renderReviewPreview() {
+  if (!reviewListEl) return;
+  const preview = getSortedReviews("newest").slice(0, 3);
+  reviewListEl.innerHTML = preview.map((review) => renderReviewCard(review)).join("");
+}
+
+function openReviewListModal() {
+  if (!reviewListModalEl) return;
+  renderReviewFullList();
+  reviewListModalEl.classList.add("open");
+  reviewListModalEl.setAttribute("aria-hidden", "false");
+}
+
+function closeReviewListModal() {
+  if (!reviewListModalEl) return;
+  reviewListModalEl.classList.remove("open");
+  reviewListModalEl.setAttribute("aria-hidden", "true");
+}
+
+function renderReviewFullList() {
+  if (!reviewListFullEl) return;
+  const mode = reviewListSortSelect?.value || "newest";
+  const sorted = getSortedReviews(mode);
+  reviewListFullEl.innerHTML = sorted
+    .map((review) => renderReviewCard(review, { showImages: true }))
+    .join("");
+}
+
+function getSortedReviews(mode) {
+  const list = [...MOCK_REVIEWS];
+  switch (mode) {
+    case "oldest":
+      return list.sort((a, b) => new Date(a.date) - new Date(b.date));
+    case "rating-high":
+      return list.sort((a, b) => b.rating - a.rating || new Date(b.date) - new Date(a.date));
+    case "rating-low":
+      return list.sort((a, b) => a.rating - b.rating || new Date(b.date) - new Date(a.date));
+    case "photos":
+      return list.sort(
+        (a, b) => (b.photos?.length || 0) - (a.photos?.length || 0) || new Date(b.date) - new Date(a.date)
+      );
+    default:
+      return list.sort((a, b) => new Date(b.date) - new Date(a.date));
+  }
+}
+
+function renderReviewCard(review, options = {}) {
+  const { showImages = false } = options;
+  const stars = "★".repeat(review.rating) + "☆".repeat(5 - review.rating);
+  const formattedDate = new Date(review.date).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+  const photos =
+    showImages && review.photos?.length
+      ? `<div class="review-photo-grid">
+          ${review.photos
+            .slice(0, 3)
+            .map((src) => `<img src="${src}" alt="Review photo" />`)
+            .join("")}
+        </div>`
+      : "";
+  return `
+    <article class="review-card">
+      <div class="review-comment-header">
+        <strong>${escapeHTML(review.name)}</strong>
+        <span class="review-rating">${stars}</span>
+      </div>
+      <p class="review-comment-text">${escapeHTML(review.comment)}</p>
+      ${photos}
+      <small class="review-date">${formattedDate}</small>
+    </article>
+  `;
+}
+
+function initMockAuthState() {
+  const authElements = document.querySelectorAll("[data-auth-visible]");
+  const signOutBtn = document.getElementById("nav-signout");
+  const profileSignOutBtn = document.getElementById("profile-signout");
+  const signInForm = document.getElementById("signin-form");
+  const signUpForm = document.getElementById("signup-form");
+
+  const syncAuthUI = () => {
+    const isSignedIn = isUserSignedIn();
+    authElements.forEach((element) => {
+      const shouldShow =
+        element.dataset.authVisible === "signed-in" ? isSignedIn : !isSignedIn;
+      element.style.display = shouldShow ? "" : "none";
+    });
+  };
+
+  const handleSignOut = () => {
+    localStorage.removeItem(AUTH_STORAGE_KEY);
+    syncAuthUI();
+    if (document.body.classList.contains("profile-page")) {
+      window.location.href = "signin.html";
+    } else if (!window.location.pathname.endsWith("homepage.html")) {
+      window.location.href = "homepage.html";
+    }
+  };
+
+  signOutBtn?.addEventListener("click", handleSignOut);
+  profileSignOutBtn?.addEventListener("click", handleSignOut);
+
+  const handleAuthSuccess = () => {
+    localStorage.setItem(AUTH_STORAGE_KEY, "true");
+    window.location.href = "homepage.html#my-orders";
+  };
+
+  signInForm?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    handleAuthSuccess();
+  });
+
+  signUpForm?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    handleAuthSuccess();
+  });
+
+  syncAuthUI();
+  if (!isUserSignedIn() && document.body.classList.contains("profile-page")) {
+    window.location.href = "signin.html";
+  }
+}
+
+function isUserSignedIn() {
+  return localStorage.getItem(AUTH_STORAGE_KEY) === "true";
 }
 
 function isOrderPast(order) {

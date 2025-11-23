@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profile · State National Parks</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="profile-page">
+    <header class="site-header">
+      <div class="logo">
+        <span class="accent-dot"></span>
+        State National Parks
+      </div>
+        <nav class="nav-links">
+          <a href="homepage.html#access">Home</a>
+          <a href="homepage.html#tickets">Tickets</a>
+          <a href="homepage.html#my-orders">My Orders</a>
+          <a href="merchandise.html">Merchandise</a>
+          <a href="signin.html" class="btn ghost small nav-auth-link" data-auth-visible="signed-out">Sign in</a>
+          <a href="signup.html" class="btn primary small nav-auth-link" data-auth-visible="signed-out">Create account</a>
+          <a href="profile.html" aria-current="page" class="nav-avatar nav-auth-link" data-auth-visible="signed-in" aria-label="Profile">
+            <span>EX</span>
+          </a>
+        </nav>
+    </header>
+
+    <main class="profile-main">
+        <section class="profile-hero">
+        <div class="profile-avatar-large">EX</div>
+          <div class="profile-hero-content">
+            <div>
+              <p class="eyebrow">Signed in</p>
+              <h1>Example Customer</h1>
+              <p class="muted">example@email.com · example.user</p>
+            </div>
+            <ul>
+              <li><strong>Membership</strong><span>Explorer tier</span></li>
+              <li><strong>Preferred park</strong><span>Skyline Canyon</span></li>
+            </ul>
+          </div>
+          <button type="button" class="btn ghost profile-signout" id="profile-signout">Sign out</button>
+        </section>
+    </main>
+
+    <footer>
+      <p class="muted">© State National Parks · Demo frontend</p>
+    </footer>
+
+    <script src="app.js" defer></script>
+  </body>
+</html>
