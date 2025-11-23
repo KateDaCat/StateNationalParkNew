@@ -1439,6 +1439,7 @@ function validateReviewForm() {
 function initMockAuthState() {
   const authElements = document.querySelectorAll("[data-auth-visible]");
   const signOutBtn = document.getElementById("nav-signout");
+  const profileSignOutBtn = document.getElementById("profile-signout");
   const signInForm = document.getElementById("signin-form");
   const signUpForm = document.getElementById("signup-form");
 
@@ -1451,13 +1452,18 @@ function initMockAuthState() {
     });
   };
 
-  signOutBtn?.addEventListener("click", () => {
+  const handleSignOut = () => {
     localStorage.removeItem(AUTH_STORAGE_KEY);
     syncAuthUI();
-    if (!window.location.pathname.endsWith("homepage.html")) {
+    if (document.body.classList.contains("profile-page")) {
+      window.location.href = "signin.html";
+    } else if (!window.location.pathname.endsWith("homepage.html")) {
       window.location.href = "homepage.html";
     }
-  });
+  };
+
+  signOutBtn?.addEventListener("click", handleSignOut);
+  profileSignOutBtn?.addEventListener("click", handleSignOut);
 
   const handleAuthSuccess = () => {
     localStorage.setItem(AUTH_STORAGE_KEY, "true");
@@ -1475,6 +1481,9 @@ function initMockAuthState() {
   });
 
   syncAuthUI();
+  if (!isUserSignedIn() && document.body.classList.contains("profile-page")) {
+    window.location.href = "signin.html";
+  }
 }
 
 function isUserSignedIn() {
