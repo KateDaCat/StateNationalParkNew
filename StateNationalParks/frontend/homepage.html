@@ -159,6 +159,11 @@
             <button type="button" class="btn primary review-open-btn" id="review-open-btn">Write a review</button>
           </section>
 
+          <section class="review-list-section">
+            <div class="review-list" id="review-list"></div>
+            <button type="button" class="btn ghost small" id="review-view-all">More reviews</button>
+          </section>
+
           <div class="review-modal" id="review-modal" aria-hidden="true">
             <div class="review-modal-backdrop" data-review-close></div>
             <div class="review-modal-card" role="dialog" aria-modal="true" aria-labelledby="review-modal-title">
@@ -204,6 +209,28 @@
                   <button type="submit" class="btn primary">Submit review</button>
                 </div>
               </form>
+            </div>
+          </div>
+
+          <div class="review-list-modal" id="review-list-modal" aria-hidden="true">
+            <div class="review-modal-backdrop" data-review-list-close></div>
+            <div class="review-list-card">
+              <header>
+                <h3>All reviews</h3>
+                <button type="button" class="review-modal-close" aria-label="Close dialog" data-review-list-close>×</button>
+              </header>
+              <div class="review-list-toolbar">
+                <label>
+                  Sort by
+                  <select id="review-list-sort">
+                    <option value="newest">Date · newest first</option>
+                    <option value="oldest">Date · oldest first</option>
+                    <option value="rating-high">Rating · high to low</option>
+                    <option value="rating-low">Rating · low to high</option>
+                  </select>
+                </label>
+              </div>
+              <div class="review-list review-list-full" id="review-list-full"></div>
             </div>
           </div>
     </main>
